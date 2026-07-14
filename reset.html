@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reset your password — TradeReady</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; min-height: 100vh; margin: 0;
+      background: #f5f5f7; color: #1d1d1f; padding: 24px;
+    }
+    .card {
+      background: #fff; border-radius: 16px; padding: 28px 24px;
+      max-width: 360px; width: 100%; box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    .brand { font-size: 22px; font-weight: 800; color: #1d6ef2; text-align: center; margin: 0 0 4px; }
+    h1 { font-size: 18px; font-weight: 700; margin: 0 0 16px; text-align: center; }
+    p  { font-size: 14px; color: #6e6e73; line-height: 1.6; margin: 0 0 16px; text-align: center; }
+    label { display: block; font-size: 13px; font-weight: 600; color: #48484a; margin: 12px 0 6px; }
+    input {
+      width: 100%; font-size: 16px; padding: 12px; border-radius: 10px;
+      border: 1px solid #d2d2d7; background: #fafafa; color: #1d1d1f;
+    }
+    input:focus { outline: 2px solid #1d6ef2; border-color: #1d6ef2; }
+    button {
+      width: 100%; margin-top: 20px; padding: 14px; font-size: 16px; font-weight: 700;
+      color: #fff; background: #1d6ef2; border: none; border-radius: 10px; cursor: pointer;
+    }
+    button:disabled { opacity: 0.6; cursor: default; }
+    .error   { color: #d70015; background: #fdecec; border-radius: 8px; padding: 10px 12px; font-size: 13px; margin-top: 14px; text-align: center; }
+    .success { color: #1d7a2c; background: #eafbef; border-radius: 8px; padding: 10px 12px; font-size: 14px; margin-top: 14px; text-align: center; }
+    .hidden  { display: none; }
+    .icon { font-size: 40px; text-align: center; margin-bottom: 10px; }
+    @media (prefers-color-scheme: dark) {
+      body { background: #1c1c1e; color: #f2f2f7; }
+      .card { background: #2c2c2e; box-shadow: none; }
+      h1 { color: #f2f2f7; }
+      p { color: #aeaeb2; }
+      label { color: #d1d1d6; }
+      input { background: #1c1c1e; border-color: #48484a; color: #f2f2f7; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <p class="brand">TradeReady</p>
+
+    <!-- Checking the link -->
+    <div id="checking">
+      <h1>Reset your password</h1>
+      <p>Checking your reset link…</p>
+    </div>
+
+    <!-- Link invalid or expired -->
+    <div id="invalid" class="hidden">
+      <div class="icon">⏱️</div>
+      <h1>Link expired or invalid</h1>
+      <p>This password reset link is no longer valid. Open the TradeReady app, tap
+      "Forgot password?", and we'll send you a fresh link.</p>
+    </div>
+
+    <!-- Set a new password -->
+    <div id="form" class="hidden">
+      <h1>Choose a new password</h1>
+      <label for="pw">New password</label>
+      <input id="pw" type="password" autocomplete="new-password" placeholder="Min. 6 characters">
+      <label for="pw2">Confirm new password</label>
+      <input id="pw2" type="password" autocomplete="new-password" placeholder="Repeat password">
+      <button id="submit">Update password</button>
+      <div id="formError" class="error hidden"></div>
+    </div>
+
+    <!-- Done -->
+    <div id="done" class="hidden">
+      <div class="icon">✅</div>
+      <h1>Password updated</h1>
+      <p class="success">Your password has been changed. Return to the TradeReady app
+      and sign in with your new password.</p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.0/dist/umd/supabase.js"
+          integrity="sha384-3wY11tldQ5+yWqAvmTN4XtQvnjoTva0cV15O/O/O5NTtp0ivVopSzLOzsVXWZse9"
+          crossorigin="anonymous"></script>
+  <script>
+    // Publishable key — same one embedded in the shipped app; safe by design (RLS enforced).
+    var SUPABASE_URL = 'https://ncbqswfdvckmdocbawaa.supabase.co';
+    var SUPABASE_KEY = 'sb_publishable_eTyJedvrw47RtZ0waCj8Bw_SDOllgvF';
+
+    var client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    function show(id) {
+      ['checking', 'invalid', 'form', 'done'].forEach(function (s) {
+        document.getElementById(s).classList.toggle('hidden', s !== id);
+      });
+    }
+
+    // Supabase appends errors to the URL hash, e.g. #error=access_denied&error_code=otp_expired
+    var hash = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+    if (hash.get('error')) {
+      show('invalid');
+    } else {
+      // detectSessionInUrl (default true in browsers) exchanges the recovery token
+      // automatically; wait for the client to finish, then check for a session.
+      var settled = false;
+      client.auth.onAuthStateChange(function (event, session) {
+        if (settled) return;
+        if (event === 'PASSWORD_RECOVERY' || (event === 'SIGNED_IN' && session)) {
+          settled = true;
+          show('form');
+        }
+      });
+      // Fallback: if no auth event arrives shortly, the link was bad or already used.
+      setTimeout(function () {
+        if (settled) return;
+        client.auth.getSession().then(function (res) {
+          settled = true;
+          show(res.data.session ? 'form' : 'invalid');
+        });
+      }, 2500);
+    }
+
+    document.getElementById('submit').addEventListener('click', function () {
+      var pw  = document.getElementById('pw').value;
+      var pw2 = document.getElementById('pw2').value;
+      var errBox = document.getElementById('formError');
+      errBox.classList.add('hidden');
+
+      if (pw.length < 6) {
+        errBox.textContent = 'Password must be at least 6 characters.';
+        errBox.classList.remove('hidden');
+        return;
+      }
+      if (pw !== pw2) {
+        errBox.textContent = 'Passwords do not match.';
+        errBox.classList.remove('hidden');
+        return;
+      }
+
+      var btn = document.getElementById('submit');
+      btn.disabled = true;
+      btn.textContent = 'Updating…';
+
+      client.auth.updateUser({ password: pw }).then(function (res) {
+        if (res.error) {
+          btn.disabled = false;
+          btn.textContent = 'Update password';
+          errBox.textContent = res.error.message || 'Could not update the password. Try requesting a new link from the app.';
+          errBox.classList.remove('hidden');
+          return;
+        }
+        // Clean up the browser session so the token doesn't linger on shared devices.
+        client.auth.signOut().finally(function () { show('done'); });
+      });
+    });
+  </script>
+</body>
+</html>
