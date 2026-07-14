@@ -28,7 +28,7 @@
 <div class="page">
   <div class="brand">TradeReady</div>
   <h1>Privacy Policy</h1>
-  <p class="meta">Effective date: July 3, 2026</p>
+  <p class="meta">Effective date: July 14, 2026</p>
 
   <p>TradeReady ("we," "our," or "the app") is a job management and invoicing tool for independent tradespeople. This policy explains what data we collect, how we use it, and your choices.</p>
 
@@ -38,14 +38,16 @@
     <li><strong>Business profile:</strong> business name, contact name, phone, address, and trade type — entered by you in Settings.</li>
     <li><strong>App data:</strong> jobs, invoices, customers, expenses, and notes you create inside the app.</li>
     <li><strong>Notification preferences:</strong> your invoice reminder rules and, if you grant permission, a device push token used to deliver local notifications.</li>
-    <li><strong>API keys (Groq, Anthropic):</strong> stored exclusively in your device's iOS Keychain or Android Keystore. These keys never leave your device to TradeReady servers.</li>
+    <li><strong>Subscription status:</strong> when you subscribe to TradeReady Pro, we receive your subscription state (active, trial, expired) and purchase receipts from Apple or Google via RevenueCat. We never see or store your card number — payment is handled entirely by the app stores.</li>
+    <li><strong>Optional API keys (Groq, Anthropic):</strong> if you choose to use your own AI keys (Settings → AI Assistant → Advanced), they are stored exclusively in your device's iOS Keychain or Android Keystore and never leave your device to TradeReady servers.</li>
   </ul>
 
   <h2>2. How We Use Your Information</h2>
   <ul>
     <li>To provide, sync, and maintain the TradeReady service across your devices.</li>
     <li>To send local push notifications about upcoming or overdue invoices (only with your explicit permission).</li>
-    <li>To generate AI-assisted estimate and outreach messages using the third-party AI service keys you configure.</li>
+    <li>To generate AI-assisted estimates, outreach messages, chat responses, and pricing suggestions. By default these requests go through TradeReady's secure backend using our own AI provider accounts; you may instead supply your own API keys.</li>
+    <li>To verify your TradeReady Pro subscription and unlock the features you've paid for.</li>
   </ul>
 
   <h2>3. Data Storage</h2>
@@ -55,15 +57,16 @@
   <p>TradeReady integrates with the following services. Each processes data according to its own privacy policy.</p>
   <ul>
     <li><strong>Supabase</strong> — authentication and cloud data sync. <a href="https://supabase.com/privacy" target="_blank">supabase.com/privacy</a></li>
-    <li><strong>Stripe</strong> — payment link generation (if you configure a Stripe backend). <a href="https://stripe.com/privacy" target="_blank">stripe.com/privacy</a></li>
-    <li><strong>Anthropic</strong> — AI-generated outreach and estimate messages (only if you supply your own API key). Invoice and job details are sent to Anthropic to generate the message. <a href="https://www.anthropic.com/legal/privacy" target="_blank">anthropic.com/legal/privacy</a></li>
-    <li><strong>Groq</strong> — AI chat assistant (only if you supply your own API key). Chat messages are sent to Groq to generate responses. <a href="https://groq.com/privacy-policy/" target="_blank">groq.com/privacy-policy</a></li>
+    <li><strong>Stripe</strong> — payment collection from your customers through your own connected Stripe account (Stripe Connect), and payment-link generation. <a href="https://stripe.com/privacy" target="_blank">stripe.com/privacy</a></li>
+    <li><strong>RevenueCat</strong> — subscription management for TradeReady Pro. RevenueCat receives purchase receipts from Apple/Google and an app user identifier so we can verify your subscription. <a href="https://www.revenuecat.com/privacy" target="_blank">revenuecat.com/privacy</a></li>
+    <li><strong>Anthropic</strong> — AI-generated estimate messages and pricebook pricing suggestions. Relevant job, invoice, or service details are sent to Anthropic to generate the text — by default through TradeReady's backend, or directly if you supply your own API key. <a href="https://www.anthropic.com/legal/privacy" target="_blank">anthropic.com/legal/privacy</a></li>
+    <li><strong>Groq</strong> — AI chat assistant. Your chat messages and a summary of your business data (revenue, overdue invoices, active jobs) are sent to Groq to generate responses — by default through TradeReady's backend, or directly if you supply your own API key. <a href="https://groq.com/privacy-policy/" target="_blank">groq.com/privacy-policy</a></li>
     <li><strong>Expo / EAS</strong> — app delivery and over-the-air updates. <a href="https://expo.dev/privacy" target="_blank">expo.dev/privacy</a></li>
     <li><strong>PostHog</strong> — anonymous product analytics (screen views, feature usage). No personal data is sent; only anonymized event names and timestamps. <a href="https://posthog.com/privacy" target="_blank">posthog.com/privacy</a></li>
     <li><strong>Sentry</strong> — crash and error reporting. When the app encounters an error, a diagnostic report (stack trace, device model, OS version) is sent to Sentry to help us fix bugs. No business data (jobs, invoices, customer names) is included. <a href="https://sentry.io/privacy/" target="_blank">sentry.io/privacy</a></li>
     <li><strong>OpenStreetMap / Nominatim</strong> — address geocoding for the route-planning feature. When you view a customer's address on a map, the address text is sent to the Nominatim API to resolve coordinates. <a href="https://osmfoundation.org/wiki/Privacy_Policy" target="_blank">osmfoundation.org/wiki/Privacy_Policy</a></li>
   </ul>
-  <p>When you use AI features, portions of your job or invoice data are transmitted to the respective AI provider to generate a message. TradeReady does not retain that data on its own servers.</p>
+  <p>AI features send data to the providers above only when you actively use them — generating a message, asking the chat assistant, or requesting a pricing suggestion. Nothing is sent in the background. Requests routed through TradeReady's backend are authenticated and rate-limited; TradeReady does not store the content of AI requests or responses on its own servers.</p>
 
   <h2>5. Data Sharing</h2>
   <p>We do not sell, rent, or share your personal information with third parties for advertising or marketing purposes. Data is shared only with the service providers listed above as necessary to operate the app.</p>
@@ -73,21 +76,36 @@
 
   <h2>7. Your Rights and Choices</h2>
   <ul>
-    <li><strong>Delete your data:</strong> sign out from Settings to clear all local data from your device. To delete your cloud account and all associated records, email us at <a href="mailto:support@gettradereadyapp.com">support@gettradereadyapp.com</a>.</li>
+    <li><strong>Delete your account and data — in the app:</strong> go to <strong>Settings → Delete Account</strong>. This permanently deletes your cloud account and every record we hold about you (jobs, invoices, customers, expenses, settings) and clears the app's local data. Deletion is immediate and cannot be undone. If you can't access the app, email us at <a href="mailto:support@gettradereadyapp.com">support@gettradereadyapp.com</a> and we will delete your account for you.</li>
+    <li><strong>Subscriptions are cancelled separately:</strong> deleting your account does not cancel an active TradeReady Pro subscription. Cancel it in your Apple&nbsp;ID or Google&nbsp;Play subscription settings — otherwise the store may continue to bill you.</li>
+    <li><strong>Retention:</strong> we keep your cloud data only for as long as your account exists. When you delete your account, your records are removed from our database immediately.</li>
+    <li><strong>Sign out only:</strong> signing out from Settings clears local data from your device but leaves your cloud account intact for your next sign-in.</li>
     <li><strong>Notification permissions:</strong> revoke at any time through your device's system Settings.</li>
-    <li><strong>AI features:</strong> entirely opt-in. Simply leave the API key fields blank in Settings to disable them.</li>
+    <li><strong>AI features:</strong> used only when you invoke them — nothing is sent to AI providers in the background. Prefer full control? Supply your own API keys under Settings → AI Assistant → Advanced and requests go directly from your device to the provider.</li>
   </ul>
-  
-  <h2>8. Location & Mapping Data</h2>
+
+  <h2>8. Your California, EU &amp; UK Privacy Rights</h2>
+  <p>Depending on where you live (including California under the CCPA/CPRA, and the EU/UK under the GDPR), you may have the right to:</p>
+  <ul>
+    <li><strong>Access</strong> the personal information we hold about you;</li>
+    <li><strong>Correct</strong> inaccurate information (you can edit your business profile and records directly in the app);</li>
+    <li><strong>Delete</strong> your personal information (see "Delete your account" above);</li>
+    <li><strong>Export</strong> your data in a portable format — email us and we will provide your records;</li>
+    <li><strong>Know</strong> what categories of data we collect and why (sections 1–4 of this policy).</li>
+  </ul>
+  <p>We do not sell or share your personal information as those terms are defined under the CCPA/CPRA, and we do not use it for targeted advertising. We will never discriminate against you for exercising a privacy right. For EU/UK users: we process your data to perform our contract with you (providing the app) and for our legitimate interest in keeping the service reliable and secure; you may lodge a complaint with your local supervisory authority.</p>
+  <p>To exercise any of these rights, use the in-app tools described above or email <a href="mailto:support@gettradereadyapp.com">support@gettradereadyapp.com</a>. We respond within 30 days.</p>
+
+  <h2>9. Location & Mapping Data</h2>
   <p>The app may use your device's platform geocoding service (Apple Maps on iOS, Google Maps on Android) to look up or display address information. Address strings are processed by Apple or Google according to their respective privacy policies. This data is not transmitted to or stored by TradeReady.</p>
   
-  <h2>9. Children's Privacy</h2>
+  <h2>10. Children's Privacy</h2>
   <p>TradeReady is not directed to children under the age of 13. We do not knowingly collect information from children. If you believe a child has provided us with personal information, contact us and we will delete it.</p>
 
-  <h2>10. Changes to This Policy</h2>
+  <h2>11. Changes to This Policy</h2>
   <p>We may update this policy from time to time. The effective date at the top of this page will reflect any changes. Continued use of the app after changes are posted constitutes your acceptance of the updated policy.</p>
 
-  <h2>11. Contact Us</h2>
+  <h2>12. Contact Us</h2>
   <p>Questions or requests regarding your privacy? Email us at <a href="mailto:support@gettradereadyapp.com">support@gettradereadyapp.com</a>.</p>
 
   <div class="footer">
