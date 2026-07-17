@@ -1,0 +1,8 @@
+# Gitleaks false positive — verified public-by-design client key (audit 2026-07-16).
+# The Supabase publishable anon key (sb_publishable_...) is intentionally embedded in
+# reset.html so the password-reset page can call Supabase auth; RLS enforces access.
+#
+# Fingerprint format: <commit>:<file>:<rule>:<line>. If a future commit moves/edits
+# this line, gitleaks reports a NEW fingerprint — re-verify, then add it here.
+
+4eecd832ffd52510c0060c6476e17ea5eaac2d67:reset.html:generic-api-key:91
