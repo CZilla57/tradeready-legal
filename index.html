@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Support — TradeReady</title>
   <meta name="description" content="Support for TradeReady, the job management and invoicing app for independent tradespeople. Contact us, browse common questions, or read our privacy policy and terms.">
+  <meta name="apple-itunes-app" content="app-id=6790681059">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -29,6 +30,16 @@
     .contact .email { font-size: 1.15rem; font-weight: 700; word-break: break-word; }
     .contact p:last-child { margin-bottom: 0; }
     .links { display: flex; flex-wrap: wrap; gap: .75rem 1.5rem; margin-top: .5rem; }
+    .cta {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 44px; padding: .7rem 1.35rem;
+      background: #2563eb; color: #fff; text-decoration: none;
+      font-size: .95rem; font-weight: 600; border-radius: 10px;
+    }
+    .cta:hover { background: #1d4ed8; }
+    .cta:focus-visible { outline: 3px solid #93c5fd; outline-offset: 2px; }
+    .get { margin: -1rem 0 2rem; }
+    .get .note { font-size: .875rem; color: #6b7280; margin: .6rem 0 0; }
     .footer { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid #e5e7eb;
               font-size: .875rem; color: #6b7280; }
     @media (prefers-color-scheme: dark) {
@@ -40,6 +51,9 @@
       .brand { color: #5b9bff; }
       a { color: #5b9bff; }
       .contact { background: #1f2a3d; border-color: #2f4468; }
+      .cta { background: #2f6fe4; color: #fff; }
+      .cta:hover { background: #2560cf; }
+      .get .note { color: #8e8e93; }
       .footer { border-top-color: #3a3a3c; color: #8e8e93; }
     }
   </style>
@@ -49,6 +63,11 @@
   <div class="brand">TradeReady</div>
   <h1>Support</h1>
   <p class="meta">Job management and invoicing for independent tradespeople</p>
+
+  <div class="get">
+    <a class="cta" href="https://apps.apple.com/app/id6790681059">Download on the App Store</a>
+    <p class="note">Don't have the app yet? TradeReady is free to download for iPhone.</p>
+  </div>
 
   <p>Need a hand with TradeReady? Email us — a real person reads every message.</p>
 
