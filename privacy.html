@@ -28,7 +28,7 @@
 <div class="page">
   <div class="brand">TradeReady</div>
   <h1>Privacy Policy</h1>
-  <p class="meta">Effective date: July 14, 2026</p>
+  <p class="meta">Effective date: July 30, 2026</p>
 
   <p>TradeReady ("we," "our," or "the app") is a job management and invoicing tool for independent tradespeople. This policy explains what data we collect, how we use it, and your choices.</p>
 
@@ -47,7 +47,7 @@
   <ul>
     <li>To provide, sync, and maintain the TradeReady service across your devices.</li>
     <li>To send local push notifications about upcoming or overdue invoices (only with your explicit permission).</li>
-    <li>To generate AI-assisted estimates, outreach messages, chat responses, and pricing suggestions. By default these requests go through TradeReady's secure backend using our own AI provider accounts; you may instead supply your own API keys.</li>
+    <li>To generate AI-assisted estimates, outreach messages, chat responses, pricing suggestions, and receipt scans (reading a receipt photo you attach to pre-fill the expense form). By default these requests go through TradeReady's secure backend using our own AI provider accounts; you may instead supply your own API keys.</li>
     <li>To verify your TradeReady Pro subscription and unlock the features you've paid for.</li>
   </ul>
 
@@ -60,14 +60,14 @@
     <li><strong>Supabase</strong> — authentication and cloud data sync. <a href="https://supabase.com/privacy" target="_blank">supabase.com/privacy</a></li>
     <li><strong>Stripe</strong> — payment collection from your customers through your own connected Stripe account (Stripe Connect), and payment-link generation. <a href="https://stripe.com/privacy" target="_blank">stripe.com/privacy</a></li>
     <li><strong>RevenueCat</strong> — subscription management for TradeReady Pro. RevenueCat receives purchase receipts from Apple/Google and an app user identifier so we can verify your subscription. <a href="https://www.revenuecat.com/privacy" target="_blank">revenuecat.com/privacy</a></li>
-    <li><strong>Anthropic</strong> — AI-generated estimate messages and pricebook pricing suggestions. Relevant job, invoice, or service details are sent to Anthropic to generate the text — by default through TradeReady's backend, or directly if you supply your own API key. <a href="https://www.anthropic.com/legal/privacy" target="_blank">anthropic.com/legal/privacy</a></li>
+    <li><strong>Anthropic</strong> — AI-generated estimate messages, pricebook pricing suggestions, and receipt scanning. Relevant job, invoice, or service details are sent to Anthropic to generate the text — by default through TradeReady's backend, or directly if you supply your own API key. When you attach a receipt photo to an expense, that photo is sent to Anthropic to read the merchant, total, and date; receipt photos you attach without scanning, and all other photos, never leave your device. <a href="https://www.anthropic.com/legal/privacy" target="_blank">anthropic.com/legal/privacy</a></li>
     <li><strong>Groq</strong> — AI chat assistant. Your chat messages and a summary of your business data (revenue, overdue invoices, active jobs) are sent to Groq to generate responses — by default through TradeReady's backend, or directly if you supply your own API key. <a href="https://groq.com/privacy-policy/" target="_blank">groq.com/privacy-policy</a></li>
     <li><strong>Expo / EAS</strong> — app delivery and over-the-air updates. <a href="https://expo.dev/privacy" target="_blank">expo.dev/privacy</a></li>
     <li><strong>PostHog</strong> — anonymous product analytics (screen views, feature usage). No personal data is sent; only anonymized event names and timestamps. <a href="https://posthog.com/privacy" target="_blank">posthog.com/privacy</a></li>
     <li><strong>Sentry</strong> — crash and error reporting. When the app encounters an error, a diagnostic report (stack trace, device model, OS version) is sent to Sentry to help us fix bugs. No business data (jobs, invoices, customer names) is included. <a href="https://sentry.io/privacy/" target="_blank">sentry.io/privacy</a></li>
     <li><strong>OpenStreetMap / Nominatim</strong> — address geocoding for the route-planning feature. When you view a customer's address on a map, the address text is sent to the Nominatim API to resolve coordinates. <a href="https://osmfoundation.org/wiki/Privacy_Policy" target="_blank">osmfoundation.org/wiki/Privacy_Policy</a></li>
   </ul>
-  <p>AI features send data to the providers above only when you actively use them — generating a message, asking the chat assistant, or requesting a pricing suggestion. Nothing is sent in the background. Requests routed through TradeReady's backend are authenticated and rate-limited; TradeReady does not store the content of AI requests or responses on its own servers.</p>
+  <p>AI features send data to the providers above only when you actively use them — generating a message, asking the chat assistant, requesting a pricing suggestion, or attaching a receipt photo to an expense. Nothing is sent in the background. Requests routed through TradeReady's backend are authenticated and rate-limited; TradeReady does not store the content of AI requests or responses (including receipt photos) on its own servers.</p>
 
   <h2>5. Data Sharing</h2>
   <p>We do not sell, rent, or share your personal information with third parties for advertising or marketing purposes. Data is shared only with the service providers listed above as necessary to operate the app.</p>
