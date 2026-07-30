@@ -1,2 +1,7 @@
 # Claude Code local workspace
 .claude/
+
+# Local copy of the supabase-js UMD bundle that reset.html loads from the CDN.
+# Kept only to compute the SRI integrity hash; nothing on the site references it,
+# so it must not be published.
+supa.js
