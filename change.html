@@ -78,15 +78,16 @@
       banner('ok', 'You approved this change' + (est.consentAt ? ' on ' + new Date(est.consentAt).toLocaleDateString() : '') + '. Thank you!');
       return;
     }
+    if (est.decision === 'declined') {
+      banner('info', 'You declined this change. If anything changes, your tradesperson will send a new request.');
+      return;
+    }
     var lines = (est.lineItems || []).map(function (li) {
       return '<div class="row"><span>' + esc(li.label) + '</span><span>' + money(li.amount) + '</span></div>';
     }).join('');
-    var declinedNote = est.decision === 'declined'
-      ? '<div class="banner info" style="margin-bottom:1rem">You previously declined this. You can still approve it below.</div>' : '';
     var descriptionHtml = est.description
       ? '<p class="muted" style="margin-top:.5rem">' + esc(est.description) + '</p>' : '';
     content.innerHTML =
-      declinedNote +
       '<h1>' + esc(est.jobTitle) + '</h1>' +
       '<p class="muted">From ' + esc(est.businessName) + ' &middot; For ' + esc(est.customerName) + '</p>' +
       '<div style="margin-top:1rem">' + lines +
