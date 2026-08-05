@@ -43,7 +43,14 @@
   var token = params.get('t');
   var content = document.getElementById('content');
 
-  function money(n) { return '$' + Number(n || 0).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 }); }
+  // Mirrors the app's formatQuote (utils/format.ts). min:0/max:2 alone
+  // renders "$87.5" — the exact bug the app fixed in July 2026; round to
+  // cents first, then show a FULL cent pair or none.
+  function money(n) {
+    var cents = Math.round((Number(n) || 0) * 100) / 100;
+    var hasCents = cents % 1 !== 0;
+    return '$' + cents.toLocaleString(undefined, { minimumFractionDigits: hasCents ? 2 : 0, maximumFractionDigits: 2 });
+  }
   function esc(s) { var d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML; }
   function banner(cls, msg) { content.innerHTML = '<div class="banner ' + cls + '">' + esc(msg) + '</div>'; }
 

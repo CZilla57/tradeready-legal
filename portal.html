@@ -42,7 +42,19 @@
   var content = document.getElementById('content');
 
   function esc(s) { var d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML; }
-  function money(n) { return '$' + Number(n || 0).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 }); }
+  // Mirrors the app's two formatters (utils/format.ts). min:0/max:2 alone
+  // renders "$87.5" — the exact bug the app fixed in July 2026; round to
+  // cents first, then show a FULL cent pair or none.
+  function money(n) {
+    var cents = Math.round((Number(n) || 0) * 100) / 100;
+    var hasCents = cents % 1 !== 0;
+    return '$' + cents.toLocaleString(undefined, { minimumFractionDigits: hasCents ? 2 : 0, maximumFractionDigits: 2 });
+  }
+  // Invoice amounts always show cents, like the app's formatMoney.
+  function invoiceMoney(n) {
+    var cents = Math.round((Number(n) || 0) * 100) / 100;
+    return '$' + cents.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
   function banner(cls, msg) { content.innerHTML = '<div class="banner ' + cls + '">' + esc(msg) + '</div>'; }
 
   if (!token) { banner('err', 'This link is missing information. Please ask for a new link.'); }
@@ -72,14 +84,14 @@
     var right, amount;
     if (i.paid) {
       right = '<span class="chip chip-ok">Paid</span>';
-      amount = money(i.amount);
+      amount = invoiceMoney(i.amount);
     } else {
       right = i.paymentLinkUrl
         ? '<a class="button" href="' + esc(i.paymentLinkUrl) + '">Pay</a>'
         : '<span class="chip chip-warn">Due</span>';
       amount = i.balanceDue < i.amount
-        ? money(i.balanceDue) + ' of ' + money(i.amount) + ' outstanding'
-        : money(i.amount);
+        ? invoiceMoney(i.balanceDue) + ' of ' + invoiceMoney(i.amount) + ' outstanding'
+        : invoiceMoney(i.amount);
     }
     return '<div class="card"><div class="row"><strong>' + esc(i.number) + '</strong>' + right + '</div>' +
            '<div class="muted">' + amount + (i.due && !i.paid ? ' · due ' + esc(i.due) : '') + '</div></div>';
