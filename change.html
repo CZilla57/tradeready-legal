@@ -70,12 +70,12 @@
       var res = await fetch(API + '/change-view?j=' + encodeURIComponent(jobId) + '&co=' + encodeURIComponent(coId) + '&t=' + encodeURIComponent(token));
       if (!res.ok) { banner('err', 'This link is invalid or has expired.'); return; }
       render(await res.json());
-    } catch (e) { banner('err', 'Could not load the estimate. Please check your connection.'); }
+    } catch (e) { banner('err', 'Could not load this change order. Please check your connection.'); }
   }
 
   function render(est) {
     if (est.decision === 'approved') {
-      banner('ok', 'You approved this estimate' + (est.consentAt ? ' on ' + new Date(est.consentAt).toLocaleDateString() : '') + '. Thank you!');
+      banner('ok', 'You approved this change' + (est.consentAt ? ' on ' + new Date(est.consentAt).toLocaleDateString() : '') + '. Thank you!');
       return;
     }
     var lines = (est.lineItems || []).map(function (li) {
@@ -91,7 +91,7 @@
       '<p class="muted">From ' + esc(est.businessName) + ' &middot; For ' + esc(est.customerName) + '</p>' +
       '<div style="margin-top:1rem">' + lines +
       descriptionHtml +
-      '<div class="row total"><span>Total estimate</span><span>' + money(est.total) + '</span></div></div>' +
+      '<div class="row total"><span>Total for this change</span><span>' + money(est.total) + '</span></div></div>' +
       (est.context ?
         '<div class="context">' +
         '<div><span>Job total before this change</span><span id="ctx-original"></span></div>' +
@@ -127,7 +127,7 @@
       var out = await res.json();
       if (!res.ok) { banner('err', out.error || 'Something went wrong. Please try again.'); return; }
       banner(decision === 'approved' ? 'ok' : 'info',
-        decision === 'approved' ? 'Approved — thank you! Your tradesperson has been notified.' : 'You declined this estimate. Thank you for letting us know.');
+        decision === 'approved' ? 'Approved — thank you! Your tradesperson has been notified.' : 'You declined this change. Thank you for letting us know.');
     } catch (e) { banner('err', 'Could not submit. Please check your connection and try again.'); }
   }
 </script>
