@@ -27,7 +27,7 @@
       --bg: #f5f5f1;
       --surface: #ffffff;
       --ink: #14213d;
-      --muted: #8b93a3;
+      --muted: #666e7e; /* ≥4.5:1 on --bg and --surface (WCAG AA) */
       --accent: #1d5c9e;
       --accent-bg: #e4eef7;
       --hero-navy: #0c335e;
@@ -44,7 +44,7 @@
         --bg: #101826;
         --surface: #182238;
         --ink: #f2f4f8;
-        --muted: #6e7789;
+        --muted: #8b96a9; /* ≥4.5:1 on --bg and --surface (WCAG AA) */
         --accent: #5b9bdb;
         --accent-bg: #1b2c40;
         --line: #2a3650;
@@ -61,7 +61,8 @@
     .wrap { max-width: 1080px; margin: 0 auto; padding: 0 1.25rem; }
 
     /* ---------- header ---------- */
-    header { background: var(--hero-navy); }
+    .topbar { position: sticky; top: 0; z-index: 100; background: var(--hero-navy); border-bottom: 1px solid var(--hero-line); }
+    @media (min-width: 721px) { html { scroll-padding-top: 5.25rem; } }
     .nav { display: flex; align-items: center; gap: 1.5rem; padding: 1.1rem 0; }
     .wordmark { font-family: var(--display); font-weight: 700; font-size: 1.35rem; letter-spacing: .02em; color: var(--hero-ink); text-decoration: none; }
     .wordmark span { color: #f0a04b; }
@@ -150,6 +151,10 @@
     .sheet .placeholder { background-image: linear-gradient(rgba(29,92,158,.14) 1px, transparent 1px), linear-gradient(90deg, rgba(29,92,158,.14) 1px, transparent 1px); }
     .sheet .placeholder span { color: var(--muted); }
 
+    /* mid-page download strip */
+    .cta-strip { text-align: center; }
+    .cta-strip .store-badge { margin-top: 1.1rem; }
+
     /* pricing */
     .price-card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 2.5rem; max-width: 620px; margin: 0 auto; text-align: center; }
     .price-line { font-family: var(--mono); font-weight: 500; font-size: clamp(1.15rem, 3vw, 1.5rem); margin: 1.1rem 0 .4rem; letter-spacing: .01em; }
@@ -182,7 +187,10 @@
       .tcell:nth-child(4n) { border-right: none; }
     }
     @media (max-width: 720px) {
-      .nav nav { display: none; }
+      .topbar { position: static; }
+      .nav { flex-wrap: wrap; gap: .3rem 1.5rem; padding: .85rem 0; }
+      .nav nav { order: 3; flex-basis: 100%; margin-left: 0; }
+      .nav nav a { padding: .3rem 0; }
       .nav .mini-cta { margin-left: auto; }
       .steps { grid-template-columns: 1fr; gap: 1.5rem; padding: 2.5rem 0; }
       .section { padding: 2.75rem 0; }
@@ -195,7 +203,7 @@
 </head>
 <body>
 
-<header>
+<header class="topbar">
   <div class="wrap">
     <div class="nav">
       <a class="wordmark" href="/">TradeReady<span>.</span></a>
@@ -207,7 +215,9 @@
       <a class="mini-cta" href="https://apps.apple.com/app/id6790681059">Get the app</a>
     </div>
   </div>
+</header>
 
+<main>
   <div class="hero">
     <div class="wrap">
       <div class="hero-grid">
@@ -232,7 +242,10 @@
         <div class="draft">
           <div class="phone shot" id="hero-shot">
             <div class="screen">
-              <img src="/images/hero-today.jpg" alt="TradeReady Today screen showing the day's jobs and money at a glance" loading="lazy" onerror="this.closest('.shot').classList.add('missing')">
+              <picture>
+                <source type="image/webp" srcset="/images/hero-today.webp">
+                <img src="/images/hero-today.jpg" alt="TradeReady Today screen showing the day's jobs and money at a glance" loading="eager" fetchpriority="high" onerror="this.closest('.shot').classList.add('missing')">
+              </picture>
               <div class="placeholder" aria-hidden="true"><span>Today screen</span></div>
             </div>
           </div>
@@ -244,9 +257,7 @@
       </div>
     </div>
   </div>
-</header>
 
-<main>
   <div class="wrap">
 
     <div class="steps" id="features">
@@ -282,7 +293,10 @@
         <div class="draft">
           <div class="phone shot">
             <div class="screen">
-              <img src="/images/shot-pricing.jpg" alt="TradeReady pricing calculator with labor, materials, and margin" loading="lazy" onerror="this.closest('.shot').classList.add('missing')">
+              <picture>
+                <source type="image/webp" srcset="/images/shot-pricing.webp">
+                <img src="/images/shot-pricing.jpg" alt="TradeReady pricing calculator with labor, materials, and margin" loading="lazy" onerror="this.closest('.shot').classList.add('missing')">
+              </picture>
               <div class="placeholder" aria-hidden="true"><span>Pricing calculator</span></div>
             </div>
           </div>
@@ -322,12 +336,27 @@
         <div class="draft">
           <div class="phone shot">
             <div class="screen">
-              <img src="/images/shot-invoice.jpg" alt="TradeReady invoice with a card payment link" loading="lazy" onerror="this.closest('.shot').classList.add('missing')">
+              <picture>
+                <source type="image/webp" srcset="/images/shot-invoice.webp">
+                <img src="/images/shot-invoice.jpg" alt="TradeReady invoice with a card payment link" loading="lazy" onerror="this.closest('.shot').classList.add('missing')">
+              </picture>
               <div class="placeholder" aria-hidden="true"><span>Invoice + payment link</span></div>
             </div>
           </div>
         </div>
       </div>
+    </section>
+
+    <section class="section cta-strip" aria-label="Download TradeReady">
+      <p class="eyebrow">Free to download &middot; 2-week free trial</p>
+      <a class="store-badge" href="https://apps.apple.com/app/id6790681059" aria-label="Download TradeReady on the App Store">
+        <svg viewBox="0 0 180 53" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
+          <rect x=".5" y=".5" width="179" height="52" rx="9.5" fill="#000" stroke="#a6a6a6"/>
+          <path fill="#fff" d="M36.6 26.9c0-3.3 2.7-4.9 2.8-5-1.5-2.2-3.9-2.5-4.7-2.6-2-.2-3.9 1.2-4.9 1.2-1 0-2.6-1.2-4.3-1.1-2.2 0-4.2 1.3-5.3 3.2-2.3 3.9-.6 9.7 1.6 12.9 1.1 1.6 2.4 3.3 4.1 3.2 1.6-.1 2.3-1 4.2-1 2 0 2.5 1 4.3 1 1.8 0 2.9-1.6 4-3.2 1.3-1.8 1.8-3.6 1.8-3.7-.1 0-3.5-1.3-3.6-4.9zM33.4 17.2c.9-1.1 1.5-2.6 1.3-4.1-1.3.1-2.9.9-3.8 1.9-.8.9-1.6 2.5-1.4 3.9 1.5.1 3-.7 3.9-1.7z"/>
+          <text x="48" y="22" fill="#fff" font-family="'Public Sans', 'Segoe UI', sans-serif" font-size="10.5">Download on the</text>
+          <text x="48" y="40" fill="#fff" font-family="'Public Sans', 'Segoe UI', sans-serif" font-size="16.5" font-weight="600">App Store</text>
+        </svg>
+      </a>
     </section>
 
     <section class="section" aria-labelledby="h-numbers">
@@ -345,7 +374,10 @@
         <div class="draft">
           <div class="phone shot">
             <div class="screen">
-              <img src="/images/shot-chat.jpg" alt="TradeReady AI business coach answering a question about revenue" loading="lazy" onerror="this.closest('.shot').classList.add('missing')">
+              <picture>
+                <source type="image/webp" srcset="/images/shot-chat.webp">
+                <img src="/images/shot-chat.jpg" alt="TradeReady AI business coach answering a question about revenue" loading="lazy" onerror="this.closest('.shot').classList.add('missing')">
+              </picture>
               <div class="placeholder" aria-hidden="true"><span>AI coach</span></div>
             </div>
           </div>

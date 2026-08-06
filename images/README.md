@@ -13,3 +13,15 @@ Light mode preferred (frames sit on navy/vellum grounds).
 
 Filenames are case-sensitive on Cloudflare Pages. JPG (not HEIC — browsers
 can't render it); iPhone HEIC exports get converted before committing.
+
+## After dropping in new captures
+
+The committed files are 640px-wide web-optimized derivatives, and each JPG has
+a `.webp` sibling that browsers get preferentially (via `<picture>` in
+index.html). **If you replace a JPG, regenerate both files from the full-size
+capture or the stale `.webp` keeps being served:**
+
+```
+ffmpeg -y -i capture.jpg -vf scale=640:-2 -q:v 3 hero-today.jpg
+ffmpeg -y -i capture.jpg -vf scale=640:-2 -c:v libwebp -quality 82 hero-today.webp
+```
