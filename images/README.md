@@ -6,7 +6,10 @@ Light mode preferred (frames sit on navy/vellum grounds).
 
 | File | Content |
 |---|---|
-| hero-today.png | Today screen |
-| shot-invoice.png | Invoice with payment link |
-| shot-pricing.png | Pricing calculator |
-| shot-chat.png | AI coach chat |
+| hero-today.jpg | Today screen |
+| shot-invoice.jpg | Invoice with payment link |
+| shot-pricing.jpg | Pricing calculator |
+| shot-chat.jpg | AI coach chat |
+
+Filenames are case-sensitive on Cloudflare Pages. JPG (not HEIC — browsers
+can't render it); iPhone HEIC exports get converted before committing.
