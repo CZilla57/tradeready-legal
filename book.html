@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Request a quote — TradeReady</title>
+  <title>Book — TradeReady</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -27,6 +27,19 @@
        some bots skip invisible fields; off-screen is the sweet spot. */
     .hp { position: absolute; left: -9999px; top: -9999px; }
     .footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #e5e7eb; font-size: .8rem; color: #9ca3af; }
+    /* Slot picker */
+    .tz { color: #6b7280; font-size: .8rem; margin-bottom: .75rem; }
+    .pills { display: flex; gap: .5rem; overflow-x: auto; padding-bottom: .5rem; margin-bottom: .75rem; }
+    .pill { flex: 0 0 auto; border: 1px solid #d1d5db; background: #fff; color: #1a1a1a;
+            border-radius: 999px; padding: .45rem .9rem; font-size: .9rem; font-weight: 600;
+            cursor: pointer; margin: 0; width: auto; }
+    .pill.sel { background: #2563eb; border-color: #2563eb; color: #fff; }
+    .slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: .5rem; }
+    .slot { border: 1px solid #d1d5db; background: #fff; color: #1a1a1a; border-radius: 8px;
+            padding: .55rem .25rem; font-size: .95rem; font-weight: 600; cursor: pointer; margin: 0; width: auto; }
+    .slot.sel { background: #2563eb; border-color: #2563eb; color: #fff; }
+    .swap { display: inline-block; margin-top: 1rem; font-size: .85rem; color: #2563eb;
+            background: none; border: none; padding: 0; width: auto; cursor: pointer; text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -42,8 +55,25 @@
   var token = params.get('b');
   var content = document.getElementById('content');
 
+  var bizName = 'this business';
+  var slotState = { timeZone: '', byDate: {}, dates: [], selDate: '', selStart: '' };
+
   function esc(s) { var d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML; }
   function banner(cls, msg) { content.innerHTML = '<div class="banner ' + cls + '">' + esc(msg) + '</div>'; }
+
+  // Frame-free labels for owner-naive values: the date renders through UTC
+  // getters so the VIEWER'S timezone can never shift the business's day.
+  function dateLabel(dateStr) {
+    var p = dateStr.split('-');
+    var d = new Date(Date.UTC(+p[0], +p[1] - 1, +p[2]));
+    return d.toLocaleDateString('en-US', { timeZone: 'UTC', weekday: 'short', month: 'short', day: 'numeric' });
+  }
+  function fmt12(hhmm) {
+    var h = +hhmm.slice(0, 2), m = hhmm.slice(3);
+    var ap = h >= 12 ? 'PM' : 'AM';
+    var h12 = h % 12 === 0 ? 12 : h % 12;
+    return h12 + ':' + m + ' ' + ap;
+  }
 
   if (!token) { banner('err', 'This link is missing information. Please ask for a new link.'); }
   else { load(); }
@@ -52,47 +82,86 @@
     try {
       var res = await fetch(API + '/config?b=' + encodeURIComponent(token));
       if (!res.ok) { banner('err', 'This link is invalid.'); return; }
-      render(await res.json());
-    } catch (e) { banner('err', 'Could not load this page. Please check your connection.'); }
+      var cfg = await res.json();
+      bizName = cfg.businessName || 'this business';
+    } catch (e) { banner('err', 'Could not load this page. Please check your connection.'); return; }
+
+    // Slot booking is an opt-in upgrade: when the slots endpoint declines
+    // (feature off, or anything else), the page IS the classic request form.
+    var slotsOk = false;
+    try { slotsOk = await fetchSlots(); } catch (e) { slotsOk = false; }
+    if (slotsOk && slotState.dates.length > 0) renderSlotMode();
+    else renderRequestMode();
   }
 
-  function render(cfg) {
-    var name = cfg.businessName || 'this business';
-    content.innerHTML =
-      '<h1>' + esc(name) + ' — Request a quote</h1>' +
-      '<p class="muted">Tell us what you need and how to reach you.</p>' +
-      '<form id="f">' +
+  async function fetchSlots() {
+    var res = await fetch(API + '/slots?b=' + encodeURIComponent(token));
+    if (!res.ok) return false;
+    var out = await res.json();
+    slotState.timeZone = out.timeZone || '';
+    slotState.byDate = {};
+    slotState.dates = [];
+    (out.slots || []).forEach(function (s) {
+      if (!slotState.byDate[s.date]) { slotState.byDate[s.date] = []; slotState.dates.push(s.date); }
+      slotState.byDate[s.date].push(s);
+    });
+    if (slotState.dates.indexOf(slotState.selDate) === -1) slotState.selDate = slotState.dates[0] || '';
+    slotState.selStart = '';
+    return true;
+  }
+
+  // ── Shared contact form (both modes; re-rendered only on mode switch so
+  //    slot refreshes never wipe what the customer typed) ──────────────────
+  function formHtml(mode) {
+    var timing = mode === 'request'
+      ? '<label for="timing">Preferred timing (optional)</label><input id="timing" maxlength="200" placeholder="e.g. weekday mornings, ASAP">'
+      : '';
+    return '<form id="f">' +
       '<label for="name">Your name</label><input id="name" maxlength="100" autocomplete="name">' +
       '<label for="phone">Phone</label><input id="phone" maxlength="50" autocomplete="tel" inputmode="tel">' +
       '<label for="email">Email</label><input id="email" maxlength="200" autocomplete="email" inputmode="email">' +
       '<label for="address">Job address (optional)</label><input id="address" maxlength="300" autocomplete="street-address">' +
       '<label for="details">What do you need done?</label><textarea id="details" maxlength="2000"></textarea>' +
-      '<label for="timing">Preferred timing (optional)</label><input id="timing" maxlength="200" placeholder="e.g. weekday mornings, ASAP">' +
+      timing +
       '<div class="hp" aria-hidden="true"><label for="website">Website</label><input id="website" tabindex="-1" autocomplete="off"></div>' +
       '<div id="fieldErr" class="field-err"></div>' +
-      '<button id="sendBtn" type="submit">Send request</button>' +
+      '<button id="sendBtn" type="submit">' + (mode === 'request' ? 'Send request' : 'Book this time') + '</button>' +
       '</form>';
-    document.getElementById('f').addEventListener('submit', function (e) { e.preventDefault(); submit(name); });
   }
 
-  function val(id) { return document.getElementById(id).value.trim(); }
+  function val(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
   function showErr(msg) {
     var el = document.getElementById('fieldErr');
     el.textContent = msg;
     el.style.display = 'block';
   }
-
-  async function submit(businessName) {
-    var payload = {
+  function contactPayload() {
+    return {
       b: token,
       name: val('name'), phone: val('phone'), email: val('email'),
       address: val('address'), details: val('details'), preferredTiming: val('timing'),
-      website: document.getElementById('website').value,
+      website: document.getElementById('website') ? document.getElementById('website').value : '',
     };
-    if (!payload.name) { showErr('Please tell us your name.'); return; }
-    if (!payload.details) { showErr('Please describe what you need done.'); return; }
-    if (!payload.phone && !payload.email) { showErr('Please give a phone or email so we can reach you.'); return; }
+  }
+  function validateContact(p) {
+    if (!p.name) { showErr('Please tell us your name.'); return false; }
+    if (!p.details) { showErr('Please describe what you need done.'); return false; }
+    if (!p.phone && !p.email) { showErr('Please give a phone or email so we can reach you.'); return false; }
+    return true;
+  }
 
+  // ── Request mode (the original flow, unchanged behavior) ────────────────
+  function renderRequestMode() {
+    content.innerHTML =
+      '<h1>' + esc(bizName) + ' — Request a quote</h1>' +
+      '<p class="muted">Tell us what you need and how to reach you.</p>' +
+      formHtml('request');
+    document.getElementById('f').addEventListener('submit', function (e) { e.preventDefault(); submitRequest(); });
+  }
+
+  async function submitRequest() {
+    var payload = contactPayload();
+    if (!validateContact(payload)) return;
     var btn = document.getElementById('sendBtn');
     btn.disabled = true; btn.textContent = 'Sending…';
     try {
@@ -107,10 +176,86 @@
         showErr(out.error || 'Something went wrong. Please try again.');
         return;
       }
-      banner('ok', 'Thanks — ' + businessName + ' got your request and will get back to you.');
+      banner('ok', 'Thanks — ' + bizName + ' got your request and will get back to you.');
     } catch (e) {
       btn.disabled = false; btn.textContent = 'Send request';
       showErr('Could not send. Please check your connection and try again.');
+    }
+  }
+
+  // ── Slot mode ───────────────────────────────────────────────────────────
+  function renderSlotMode() {
+    content.innerHTML =
+      '<h1>' + esc(bizName) + ' — Book a time</h1>' +
+      '<p class="muted">Pick an open slot and tell us what you need.</p>' +
+      '<div class="tz">Times are local to the business' + (slotState.timeZone ? ' (' + esc(slotState.timeZone) + ')' : '') + '.</div>' +
+      '<div id="slotArea"></div>' +
+      formHtml('slots') +
+      '<button type="button" class="swap" id="swapBtn">Prefer to describe your timing instead? Send a request</button>';
+    renderSlotArea();
+    document.getElementById('f').addEventListener('submit', function (e) { e.preventDefault(); submitReserve(); });
+    document.getElementById('swapBtn').addEventListener('click', renderRequestMode);
+  }
+
+  // Chips re-render alone so a slot_taken refresh keeps the typed form.
+  function renderSlotArea() {
+    var html = '<div class="pills">';
+    slotState.dates.forEach(function (d) {
+      html += '<button type="button" class="pill' + (d === slotState.selDate ? ' sel' : '') + '" data-date="' + esc(d) + '">' + esc(dateLabel(d)) + '</button>';
+    });
+    html += '</div><div class="slots">';
+    (slotState.byDate[slotState.selDate] || []).forEach(function (s) {
+      html += '<button type="button" class="slot' + (s.start === slotState.selStart ? ' sel' : '') + '" data-start="' + esc(s.start) + '">' + esc(fmt12(s.start)) + '</button>';
+    });
+    html += '</div>';
+    var area = document.getElementById('slotArea');
+    area.innerHTML = html;
+    area.querySelectorAll('.pill').forEach(function (el) {
+      el.addEventListener('click', function () {
+        slotState.selDate = el.getAttribute('data-date');
+        slotState.selStart = '';
+        renderSlotArea();
+      });
+    });
+    area.querySelectorAll('.slot').forEach(function (el) {
+      el.addEventListener('click', function () {
+        slotState.selStart = el.getAttribute('data-start');
+        renderSlotArea();
+      });
+    });
+  }
+
+  async function submitReserve() {
+    if (!slotState.selDate || !slotState.selStart) { showErr('Please pick a time slot first.'); return; }
+    var payload = contactPayload();
+    if (!validateContact(payload)) return;
+    payload.slot = { date: slotState.selDate, start: slotState.selStart };
+
+    var chosenLabel = dateLabel(slotState.selDate) + ' at ' + fmt12(slotState.selStart);
+    var btn = document.getElementById('sendBtn');
+    btn.disabled = true; btn.textContent = 'Booking…';
+    try {
+      var res = await fetch(API + '/reserve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      var out = await res.json().catch(function () { return {}; });
+      if (res.status === 409) {
+        btn.disabled = false; btn.textContent = 'Book this time';
+        showErr('That time was just taken — please pick another.');
+        try { await fetchSlots(); renderSlotArea(); } catch (e2) { /* keep the stale list */ }
+        return;
+      }
+      if (!res.ok) {
+        btn.disabled = false; btn.textContent = 'Book this time';
+        showErr(out.error || 'Something went wrong. Please try again.');
+        return;
+      }
+      banner('ok', "You're booked for " + chosenLabel + '. ' + bizName + ' has your details and will see you then.');
+    } catch (e) {
+      btn.disabled = false; btn.textContent = 'Book this time';
+      showErr('Could not book. Please check your connection and try again.');
     }
   }
 </script>
