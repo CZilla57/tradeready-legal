@@ -1,10 +1,11 @@
 # Security headers for all paths (Cloudflare Pages).
 # X-Content-Type-Options + Referrer-Policy are already injected at the platform
 # level — not duplicated here.
-# CSP ships REPORT-ONLY first; flip to enforcing only after live verification
-# of estimate/reset/book/booking/change/portal (owner checkpoint).
+# CSP enforcing since 2026-08-07 (owner-approved after zero report-only
+# violations on index/reset/book). Any new external script, CDN, or API host
+# MUST be added to the allowlist below or it will be silently blocked.
 /*
   Strict-Transport-Security: max-age=15552000; includeSubDomains
   X-Frame-Options: DENY
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
-  Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://tradeready-backend.tradeready.workers.dev https://ncbqswfdvckmdocbawaa.supabase.co https://cloudflareinsights.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://tradeready-backend.tradeready.workers.dev https://ncbqswfdvckmdocbawaa.supabase.co https://cloudflareinsights.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'
