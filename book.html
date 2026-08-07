@@ -252,7 +252,13 @@
         showErr(out.error || 'Something went wrong. Please try again.');
         return;
       }
-      banner('ok', "You're booked for " + chosenLabel + '. ' + bizName + ' has your details and will see you then.');
+      var okHtml = '<div class="banner ok">' + esc("You're booked for " + chosenLabel + '. ' + bizName + ' has your details and will see you then.') + '</div>';
+      if (out.manageToken) {
+        okHtml += '<p class="muted" style="margin-top:1rem;text-align:center">' +
+          '<a href="booking.html?m=' + encodeURIComponent(out.manageToken) + '">Manage this booking</a>' +
+          ' — confirm it, add it to your calendar, or make changes.</p>';
+      }
+      content.innerHTML = okHtml;
     } catch (e) {
       btn.disabled = false; btn.textContent = 'Book this time';
       showErr('Could not book. Please check your connection and try again.');

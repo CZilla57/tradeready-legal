@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your booking — TradeReady</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+           font-size: 16px; line-height: 1.6; color: #1a1a1a; background: #f9f9f9; padding: 2rem 1rem; }
+    .page { max-width: 560px; margin: 0 auto; background: #fff; border-radius: 12px;
+            padding: 2rem; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+    .brand { font-size: 1.4rem; font-weight: 800; color: #2563eb; margin-bottom: 1rem; }
+    h1 { font-size: 1.25rem; margin-bottom: .25rem; }
+    .muted { color: #6b7280; font-size: .9rem; margin-bottom: 1rem; }
+    .banner { padding: 1rem; border-radius: 8px; text-align: center; font-weight: 600; }
+    .ok { background: #ecfdf5; color: #065f46; }
+    .err { background: #fef2f2; color: #991b1b; }
+    .card { border: 1px solid #e5e7eb; border-radius: 10px; padding: 1rem 1.25rem; margin: 1rem 0; }
+    .when { font-size: 1.15rem; font-weight: 700; }
+    .tz { color: #6b7280; font-size: .8rem; }
+    .status { display: inline-block; margin-top: .5rem; padding: .15rem .6rem; border-radius: 999px;
+              font-size: .8rem; font-weight: 700; background: #e0e7ff; color: #3730a3; }
+    .status.ok { background: #ecfdf5; color: #065f46; }
+    .status.warn { background: #fef3c7; color: #92400e; }
+    .status.off { background: #f3f4f6; color: #6b7280; }
+    button, .btnlink { display: block; width: 100%; margin-top: .75rem; padding: .8rem; border: none;
+             border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; text-align: center;
+             text-decoration: none; }
+    .primary { background: #2563eb; color: #fff; }
+    .secondary { background: #fff; color: #2563eb; border: 1px solid #2563eb; }
+    .danger { background: #fff; color: #b91c1c; border: 1px solid #fca5a5; }
+    button:disabled { opacity: .6; cursor: default; }
+    textarea { width: 100%; padding: .7rem; border: 1px solid #d1d5db; border-radius: 8px;
+               font-size: 1rem; min-height: 80px; resize: vertical; margin-top: .75rem; }
+    .field-err { color: #b91c1c; font-size: .9rem; margin-top: .75rem; display: none; }
+    .footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #e5e7eb; font-size: .8rem; color: #9ca3af; }
+  </style>
+</head>
+<body>
+<div class="page">
+  <div class="brand">TradeReady</div>
+  <div id="content"><p class="muted">Loading…</p></div>
+  <div class="footer">This page manages one booking only. Bookmark it if you may need to change your appointment.</div>
+</div>
+
+<script>
+  var API = 'https://tradeready-backend.tradeready.workers.dev/api/booking';
+  var params = new URLSearchParams(location.search);
+  var token = params.get('m');
+  var content = document.getElementById('content');
+
+  function esc(s) { var d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML; }
+  function banner(cls, msg) { content.innerHTML = '<div class="banner ' + cls + '">' + esc(msg) + '</div>'; }
+
+  // Owner-naive labels rendered through UTC getters — the viewer's timezone
+  // can never shift the business's day (same rule as book.html).
+  function dateLabel(dateStr) {
+    var p = dateStr.split('-');
+    var d = new Date(Date.UTC(+p[0], +p[1] - 1, +p[2]));
+    return d.toLocaleDateString('en-US', { timeZone: 'UTC', weekday: 'long', month: 'long', day: 'numeric' });
+  }
+  function fmt12(hhmm) {
+    var h = +hhmm.slice(0, 2), m = hhmm.slice(3);
+    var ap = h >= 12 ? 'PM' : 'AM';
+    var h12 = h % 12 === 0 ? 12 : h % 12;
+    return h12 + ':' + m + ' ' + ap;
+  }
+
+  var STATUS_LABELS = {
+    booked: { text: 'Booked — please confirm', cls: 'warn' },
+    confirmed: { text: 'Confirmed', cls: 'ok' },
+    reschedule_requested: { text: 'Reschedule requested', cls: 'warn' },
+    cancelled: { text: 'Cancelled', cls: 'off' },
+    declined: { text: 'Cancelled by the business', cls: 'off' },
+  };
+
+  if (!token) { banner('err', 'This link is missing information.'); }
+  else { load(); }
+
+  async function load() {
+    try {
+      var res = await fetch(API + '/manage?m=' + encodeURIComponent(token));
+      if (!res.ok) { banner('err', 'This link is invalid.'); return; }
+      render(await res.json());
+    } catch (e) { banner('err', 'Could not load this page. Please check your connection.'); }
+  }
+
+  function render(b) {
+    var name = b.businessName || 'the business';
+    var st = STATUS_LABELS[b.status] || { text: b.status, cls: 'off' };
+    var html =
+      '<h1>Your appointment with ' + esc(name) + '</h1>' +
+      '<div class="card">' +
+      '<div class="when">' + esc(dateLabel(b.slot.date)) + '</div>' +
+      '<div class="when">' + esc(fmt12(b.slot.start)) + ' – ' + esc(fmt12(b.slot.end)) + '</div>' +
+      '<div class="tz">Local time at the business' + (b.slot.timeZone ? ' (' + esc(b.slot.timeZone) + ')' : '') + '</div>' +
+      '<span class="status ' + st.cls + '">' + esc(st.text) + '</span>' +
+      '</div>';
+
+    if (b.status === 'booked' || b.status === 'confirmed') {
+      if (b.status === 'booked') html += '<button class="primary" id="confirmBtn">Confirm appointment</button>';
+      html += '<a class="btnlink secondary" href="' + API + '/manage?m=' + encodeURIComponent(token) + '&format=ics">Add to calendar</a>';
+      html += '<button class="secondary" id="reschedBtn">Request a different time</button>';
+      html += '<div id="reschedBox" style="display:none"><textarea id="note" maxlength="300" placeholder="When works better for you? (optional)"></textarea>' +
+              '<button class="primary" id="reschedSend">Send reschedule request</button></div>';
+      html += '<button class="danger" id="cancelBtn">Cancel this appointment</button>';
+    } else if (b.status === 'reschedule_requested') {
+      html += '<p class="muted">' + esc(name) + ' got your reschedule request and will be in touch to arrange a new time.</p>';
+      html += '<button class="danger" id="cancelBtn">Cancel this appointment</button>';
+    } else if (b.status === 'declined') {
+      html += '<p class="muted">' + esc(name) + " couldn't keep this time. They may reach out, or you can rebook from their booking link.</p>";
+    } else {
+      html += '<p class="muted">This appointment has been cancelled.</p>';
+    }
+    html += '<div id="fieldErr" class="field-err"></div>';
+    content.innerHTML = html;
+
+    var confirmBtn = document.getElementById('confirmBtn');
+    if (confirmBtn) confirmBtn.addEventListener('click', function () { act('confirm'); });
+    var reschedBtn = document.getElementById('reschedBtn');
+    if (reschedBtn) reschedBtn.addEventListener('click', function () {
+      document.getElementById('reschedBox').style.display = 'block';
+      reschedBtn.style.display = 'none';
+    });
+    var reschedSend = document.getElementById('reschedSend');
+    if (reschedSend) reschedSend.addEventListener('click', function () {
+      act('request_reschedule', document.getElementById('note').value.trim());
+    });
+    var cancelBtn = document.getElementById('cancelBtn');
+    if (cancelBtn) cancelBtn.addEventListener('click', function () {
+      if (window.confirm('Cancel this appointment? The time will be released.')) act('cancel');
+    });
+  }
+
+  function showErr(msg) {
+    var el = document.getElementById('fieldErr');
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+
+  async function act(action, note) {
+    var buttons = content.querySelectorAll('button');
+    buttons.forEach(function (b) { b.disabled = true; });
+    try {
+      var payload = { m: token, action: action };
+      if (note) payload.note = note;
+      var res = await fetch(API + '/manage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok && res.status !== 409) {
+        buttons.forEach(function (b) { b.disabled = false; });
+        showErr('Something went wrong. Please try again.');
+        return;
+      }
+      // 409 invalid_state means the booking moved on (e.g. the business
+      // already responded) — reloading shows the current truth either way.
+      load();
+    } catch (e) {
+      buttons.forEach(function (b) { b.disabled = false; });
+      showErr('Could not reach the server. Please check your connection.');
+    }
+  }
+</script>
+</body>
+</html>
