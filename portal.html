@@ -26,6 +26,24 @@
                text-decoration: none; background: #2563eb; color: #fff; font-size: .9rem; }
     .banner { padding: 1rem; border-radius: 8px; text-align: center; font-weight: 600; }
     .err { background: #fef2f2; color: #991b1b; }
+    .ok { background: #ecfdf5; color: #065f46; }
+    .linkrow { margin-top: .5rem; display: flex; flex-wrap: wrap; gap: .75rem; font-size: .9rem; }
+    .linkrow a { color: #2563eb; font-weight: 600; text-decoration: none; }
+    .thumbs { display: flex; flex-wrap: wrap; gap: .5rem; margin: .4rem 0 .8rem; }
+    .thumbs a { display: block; width: 96px; height: 96px; border-radius: 8px; overflow: hidden;
+                border: 1px solid #e5e7eb; background: #f3f4f6; }
+    .thumbs img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .reqbox select, .reqbox textarea { width: 100%; border: 1px solid #d1d5db; border-radius: 8px;
+      padding: .55rem .7rem; font: inherit; margin-bottom: .6rem; background: #fff; }
+    .reqbox textarea { min-height: 84px; resize: vertical; }
+    .reqbox button { border: 0; padding: .55rem 1rem; border-radius: 8px; font-weight: 600;
+      background: #2563eb; color: #fff; font-size: .9rem; cursor: pointer; }
+    .reqbox button:disabled { opacity: .5; }
+    .reqnote { margin-top: .5rem; font-size: .9rem; font-weight: 600; }
+    .reqnote.bad { color: #991b1b; }
+    .reqnote.good { color: #065f46; }
+    /* Honeypot: visually gone, still in the form for bots. */
+    .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
     .footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #e5e7eb; font-size: .8rem; color: #9ca3af; }
   </style>
 </head>
@@ -41,6 +59,16 @@
   var params = new URLSearchParams(location.search);
   var token = params.get('p');
   var content = document.getElementById('content');
+  // Idempotency key for the request form: one per page load, replaced after
+  // each successful send — a network retry of the SAME send lands on the
+  // same server row, a second request gets a fresh one.
+  var requestKey = mintRequestKey();
+
+  function mintRequestKey() {
+    var bytes = new Uint8Array(16);
+    crypto.getRandomValues(bytes);
+    return Array.from(bytes).map(function (b) { return b.toString(16).padStart(2, '0'); }).join('');
+  }
 
   function esc(s) { var d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML; }
   // Mirrors the app's two formatters (utils/format.ts). min:0/max:2 alone
@@ -56,6 +84,15 @@
     var cents = Math.round((Number(n) || 0) * 100) / 100;
     return '$' + cents.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
+  // Owner-naive YYYY-MM-DD rendered through UTC getters so the viewer's zone
+  // can never shift the business day (booking.html precedent).
+  function fmtDate(ymd) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(ymd))) return esc(ymd);
+    var d = new Date(ymd + 'T00:00:00Z');
+    var days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return days[d.getUTCDay()] + ', ' + months[d.getUTCMonth()] + ' ' + d.getUTCDate();
+  }
   function banner(cls, msg) { content.innerHTML = '<div class="banner ' + cls + '">' + esc(msg) + '</div>'; }
 
   if (!token) { banner('err', 'This link is missing information. Please ask for a new link.'); }
@@ -67,6 +104,17 @@
       if (!res.ok) { banner('err', 'This link is invalid.'); return; }
       render(await res.json());
     } catch (e) { banner('err', 'Could not load this page. Please check your connection.'); }
+  }
+
+  function appointmentCard(a) {
+    var when = fmtDate(a.date) + (a.start ? ' · ' + esc(a.start) + (a.end ? '–' + esc(a.end) : '') : '');
+    var links = '<a href="' + esc(a.icsUrl) + '">Add to calendar</a>';
+    if (a.manageUrl) links += '<a href="' + esc(a.manageUrl) + '">Confirm or change</a>';
+    else links += '<a href="#request">Request a change</a>';
+    return '<div class="card"><div class="row"><strong>' + esc(a.title || 'Appointment') + '</strong>' +
+           '<span class="chip chip-info">Scheduled</span></div>' +
+           '<div class="muted">' + when + '</div>' +
+           '<div class="linkrow">' + links + '</div></div>';
   }
 
   function estimateCard(e) {
@@ -81,6 +129,19 @@
            '<div class="muted">' + money(e.total) + '</div>' + action + '</div>';
   }
 
+  function changeCard(c) {
+    var status, action = '';
+    if (c.status === 'approved') status = '<span class="chip chip-ok">Approved</span>';
+    else if (c.status === 'declined') status = '<span class="chip chip-err">Declined</span>';
+    else {
+      status = '<span class="chip chip-info">Awaiting your approval</span>';
+      action = '<div style="margin-top:.5rem"><a class="button" href="' + esc(c.changeUrl) + '">Review &amp; approve</a></div>';
+    }
+    var amt = (c.amount < 0 ? '−' : '+') + money(Math.abs(Number(c.amount) || 0));
+    return '<div class="card"><div class="row"><strong>' + esc(c.title) + '</strong>' + status + '</div>' +
+           '<div class="muted">' + amt + ' · ' + esc(c.jobTitle) + '</div>' + action + '</div>';
+  }
+
   function invoiceCard(i) {
     var right, amount;
     if (i.paid) {
@@ -90,22 +151,117 @@
       right = i.paymentLinkUrl
         ? '<a class="button" href="' + esc(i.paymentLinkUrl) + '">Pay</a>'
         : '<span class="chip chip-warn">Due</span>';
-      amount = i.balanceDue < i.amount
-        ? invoiceMoney(i.balanceDue) + ' of ' + invoiceMoney(i.amount) + ' outstanding'
-        : invoiceMoney(i.amount);
+      amount = i.amountPaid > 0
+        ? invoiceMoney(i.amountPaid) + ' paid · ' + invoiceMoney(i.balanceDue) + ' due of ' + invoiceMoney(i.amount)
+        : (i.balanceDue < i.amount
+            ? invoiceMoney(i.balanceDue) + ' of ' + invoiceMoney(i.amount) + ' outstanding'
+            : invoiceMoney(i.amount));
     }
     return '<div class="card"><div class="row"><strong>' + esc(i.number) + '</strong>' + right + '</div>' +
            '<div class="muted">' + amount + (i.due && !i.paid ? ' · due ' + esc(i.due) : '') + '</div></div>';
   }
 
+  function photosSection(photos) {
+    // Group by job title; signed URLs expire (~15 min) — a broken image on a
+    // stale tab hides itself rather than showing a broken glyph.
+    var byJob = {};
+    photos.forEach(function (p) {
+      var key = p.jobTitle || 'Photos';
+      (byJob[key] = byJob[key] || []).push(p);
+    });
+    return Object.keys(byJob).map(function (jobTitle) {
+      var imgs = byJob[jobTitle].map(function (p) {
+        return '<a href="' + esc(p.url) + '" target="_blank" rel="noopener">' +
+               '<img loading="lazy" src="' + esc(p.url) + '" alt="Job photo" ' +
+               'onerror="this.parentNode.style.display=\'none\'"></a>';
+      }).join('');
+      return '<div class="muted">' + esc(jobTitle) + '</div><div class="thumbs">' + imgs + '</div>';
+    }).join('');
+  }
+
+  function requestSection(appointments) {
+    var opts = '<option value="followup">Request follow-up work</option>';
+    appointments.forEach(function (a) {
+      var label = (a.title || 'Appointment') + ' (' + a.date + ')';
+      opts += '<option value="reschedule:' + esc(a.jobRef) + '">Reschedule: ' + esc(label) + '</option>';
+      opts += '<option value="cancel:' + esc(a.jobRef) + '">Cancel: ' + esc(label) + '</option>';
+    });
+    return '<h2 id="request">Need something else?</h2>' +
+      '<div class="card reqbox">' +
+      '<select id="reqKind">' + opts + '</select>' +
+      '<textarea id="reqNote" maxlength="300" placeholder="Tell us what you need…"></textarea>' +
+      '<input class="hp" id="reqWebsite" name="website" tabindex="-1" autocomplete="off">' +
+      '<button id="reqSend" type="button">Send request</button>' +
+      '<div id="reqStatus" class="reqnote" role="status"></div>' +
+      '</div>';
+  }
+
+  async function sendRequest() {
+    var kindRaw = document.getElementById('reqKind').value;
+    var note = document.getElementById('reqNote').value.trim();
+    var statusEl = document.getElementById('reqStatus');
+    var btn = document.getElementById('reqSend');
+    var parts = kindRaw.split(':');
+    var kind = parts[0];
+    var jobRef = parts[1] || undefined;
+
+    statusEl.className = 'reqnote';
+    if (kind === 'followup' && !note) {
+      statusEl.className = 'reqnote bad';
+      statusEl.textContent = 'Please describe what you need.';
+      return;
+    }
+
+    btn.disabled = true;
+    statusEl.textContent = 'Sending…';
+    try {
+      var res = await fetch(API + '/portal-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          p: token,
+          kind: kind,
+          note: note,
+          jobRef: jobRef,
+          requestKey: requestKey,
+          website: document.getElementById('reqWebsite').value
+        })
+      });
+      var out = await res.json().catch(function () { return {}; });
+      if (res.ok) {
+        statusEl.className = 'reqnote good';
+        statusEl.textContent = 'Request sent — we’ll be in touch.';
+        document.getElementById('reqNote').value = '';
+        requestKey = mintRequestKey(); // next request is a NEW request
+      } else {
+        statusEl.className = 'reqnote bad';
+        statusEl.textContent = out.error || 'Could not send that. Please try again.';
+      }
+    } catch (e) {
+      statusEl.className = 'reqnote bad';
+      statusEl.textContent = 'Could not send that. Please check your connection.';
+    }
+    btn.disabled = false;
+  }
+
   function render(data) {
+    var appointments = data.appointments || [];
+    var changes = data.changeOrders || [];
+    var photos = data.photos || [];
     var estimates = (data.estimates || []).map(estimateCard).join('') || '<p class="muted">No estimates yet.</p>';
     var invoices = (data.invoices || []).map(invoiceCard).join('') || '<p class="muted">No invoices yet.</p>';
-    content.innerHTML =
+
+    var html =
       '<h1>' + esc(data.businessName || 'Your account') + '</h1>' +
-      '<p class="muted">' + esc(data.customerName || '') + '</p>' +
-      '<h2>Estimates</h2>' + estimates +
-      '<h2>Invoices</h2>' + invoices;
+      '<p class="muted">' + esc(data.customerName || '') + '</p>';
+    if (appointments.length) html += '<h2>Upcoming appointments</h2>' + appointments.map(appointmentCard).join('');
+    html += '<h2>Estimates</h2>' + estimates;
+    if (changes.length) html += '<h2>Changes</h2>' + changes.map(changeCard).join('');
+    html += '<h2>Invoices</h2>' + invoices;
+    if (photos.length) html += '<h2>Photos</h2>' + photosSection(photos);
+    html += requestSection(appointments);
+    content.innerHTML = html;
+    document.getElementById('reqSend').addEventListener('click', sendRequest);
   }
 </script>
 </body>
