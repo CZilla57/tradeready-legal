@@ -7,6 +7,7 @@
   <meta name="description" content="Price jobs with confidence, send estimates and invoices in seconds, and get paid faster with payment links. The job management app for independent tradespeople. Works offline.">
   <link rel="canonical" href="https://gettradereadyapp.com/">
   <meta name="apple-itunes-app" content="app-id=6790681059">
+  <meta name="theme-color" content="#0c335e">
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <meta property="og:title" content="TradeReady — run your trade business from your pocket">
@@ -74,6 +75,9 @@
     a { color: var(--accent); }
     :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
 
+    .skip-link { position: fixed; top: -100px; left: 1rem; z-index: 300; background: var(--surface); color: var(--accent); font-weight: 600; padding: .8rem 1.1rem; border: 2px solid var(--accent); border-radius: 8px; text-decoration: none; }
+    .skip-link:focus { top: .75rem; }
+
     .wrap { max-width: 1080px; margin: 0 auto; padding: 0 1.25rem; }
 
     /* ---------- header ---------- */
@@ -83,7 +87,7 @@
     .wordmark { font-family: var(--display); font-weight: 700; font-size: 1.35rem; letter-spacing: .02em; color: var(--hero-ink); text-decoration: none; }
     .wordmark span { color: #f0a04b; }
     .nav nav { display: flex; gap: 1.4rem; margin-left: auto; }
-    .nav nav a { color: var(--hero-muted); text-decoration: none; font-weight: 600; font-size: .95rem; }
+    .nav nav a { color: var(--hero-muted); text-decoration: none; font-weight: 600; font-size: .95rem; padding: .55rem .25rem; }
     .nav nav a:hover { color: var(--hero-ink); }
     .nav .mini-cta { display: inline-block; padding: .45rem .95rem; border: 1px solid rgba(242,244,248,.35); border-radius: 8px; color: var(--hero-ink); text-decoration: none; font-weight: 600; font-size: .9rem; white-space: nowrap; }
     .nav .mini-cta:hover { background: rgba(242,244,248,.1); }
@@ -149,7 +153,7 @@
     /* value strip */
     .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; padding: 3.25rem 0; }
     .step .n { font-family: var(--mono); font-weight: 500; color: var(--accent); font-size: .82rem; letter-spacing: .14em; }
-    .step h3 { font-family: var(--display); font-size: 1.2rem; margin: .35rem 0 .3rem; }
+    .step h2 { font-family: var(--display); font-size: 1.2rem; margin: .35rem 0 .3rem; }
     .step p { color: var(--muted); font-size: .98rem; }
 
     /* feature sheets */
@@ -186,7 +190,7 @@
     .tcell:nth-child(4n) { border-right: none; }
     .tcell .k { font-family: var(--mono); font-weight: 500; font-size: .66rem; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: .3rem; }
     .tcell .v { font-size: .92rem; font-weight: 600; }
-    .tcell a { text-decoration: none; }
+    .tcell a { text-decoration: none; display: inline-block; padding: .6rem 0; margin: -.4rem 0; }
     .tcell a:hover { text-decoration: underline; }
     .colophon { font-size: .82rem; color: var(--muted); padding: 1rem 0 2.2rem; text-align: center; }
 
@@ -206,7 +210,7 @@
       .topbar { position: static; }
       .nav { flex-wrap: wrap; gap: .3rem 1.5rem; padding: .85rem 0; }
       .nav nav { order: 3; flex-basis: 100%; margin-left: 0; }
-      .nav nav a { padding: .3rem 0; }
+      .nav nav a { padding: .6rem 0; }
       .nav .mini-cta { margin-left: auto; }
       .steps { grid-template-columns: 1fr; gap: 1.5rem; padding: 2.5rem 0; }
       .section { padding: 2.75rem 0; }
@@ -218,6 +222,8 @@
   </style>
 </head>
 <body>
+
+<a class="skip-link" href="#main">Skip to content</a>
 
 <header class="topbar">
   <div class="wrap">
@@ -233,7 +239,7 @@
   </div>
 </header>
 
-<main>
+<main id="main">
   <div class="hero">
     <div class="wrap">
       <div class="hero-grid">
@@ -279,17 +285,17 @@
     <div class="steps" id="features">
       <div class="step">
         <span class="n">01 —</span>
-        <h3>Price it</h3>
+        <h2>Price it</h2>
         <p>A calculator built for the trades. Know your break-even before you quote.</p>
       </div>
       <div class="step">
         <span class="n">02 —</span>
-        <h3>Send it</h3>
+        <h2>Send it</h2>
         <p>Professional estimates and invoices by text or email.</p>
       </div>
       <div class="step">
         <span class="n">03 —</span>
-        <h3>Get paid</h3>
+        <h2>Get paid</h2>
         <p>Card-payment links that mark the invoice paid the moment the money lands.</p>
       </div>
     </div>
