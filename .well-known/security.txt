@@ -1,0 +1,4 @@
+Contact: mailto:support@gettradereadyapp.com
+Expires: 2027-08-07T00:00:00.000Z
+Canonical: https://gettradereadyapp.com/.well-known/security.txt
+Preferred-Languages: en
