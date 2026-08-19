@@ -195,22 +195,44 @@ footer { border-top: 2px solid var(--ink); margin-top: 3.5rem; }
 
 /* ---------- guides index (collection page) ---------- */
 .guides-index .article-head h1 { max-width: 24ch; }
-.guides-wrap { padding: 3rem 0 1rem; }
+.guides-wrap { padding: 2.75rem 0 1rem; }
+
+/* how-these-guides-are-researched trust block */
+.research-note { background: var(--accent-bg); border: 1px solid var(--line); border-radius: 14px; padding: 1.25rem 1.5rem; margin-bottom: 2.75rem; }
+.research-note .eyebrow { font-family: var(--mono); font-weight: 500; font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); display: block; margin-bottom: .5rem; }
+.research-note p { color: var(--ink); font-size: .93rem; line-height: 1.6; margin: 0; }
+.research-note a { color: var(--accent); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+
+/* collection sections */
+.guide-section { margin-bottom: 2.9rem; }
+.guide-section .section-head { margin-bottom: 1.2rem; }
+.guide-section .section-head h2 { font-family: var(--display); font-weight: 700; font-size: clamp(1.3rem, 3vw, 1.65rem); line-height: 1.2; }
+.guide-section .section-head p { color: var(--muted); font-size: .95rem; margin-top: .45rem; max-width: 48rem; }
+
 .guide-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; list-style: none; }
-.guide-card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 1.6rem 1.7rem; display: flex; flex-direction: column; position: relative; transition: border-color .15s ease, transform .15s ease; }
+.guide-card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; display: flex; position: relative; transition: border-color .15s ease, transform .15s ease; }
 .guide-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.guide-card:focus-within { border-color: var(--accent); }
+/* the whole card is one real link */
+.card-link { display: flex; flex-direction: column; flex: 1; padding: 1.6rem 1.7rem; text-decoration: none; color: inherit; border-radius: 14px; }
+.card-link:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .guide-card .kicker { font-family: var(--mono); font-weight: 500; font-size: .68rem; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin-bottom: .6rem; }
-.guide-card h2 { font-family: var(--display); font-weight: 700; font-size: 1.3rem; line-height: 1.2; margin-bottom: .5rem; }
-.guide-card h2 a { color: var(--ink); text-decoration: none; }
-.guide-card h2 a::after { content: ''; position: absolute; inset: 0; }
+.guide-card h3 { font-family: var(--display); font-weight: 700; font-size: 1.3rem; line-height: 1.2; margin-bottom: .5rem; color: var(--ink); }
 .guide-card p { color: var(--muted); font-size: .96rem; margin-bottom: 1rem; }
+.guide-card .card-link:hover h3 { color: var(--accent); }
+/* audience · reading time · last reviewed */
+.card-meta { list-style: none; display: flex; flex-wrap: wrap; align-items: baseline; margin: 0 0 1.1rem; padding: 0; font-family: var(--mono); font-weight: 500; font-size: .68rem; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+.card-meta li { position: static; padding: 0; margin: 0; }
+.card-meta li::before { content: none; }
+.card-meta li + li::before { content: '·'; color: var(--line); margin: 0 .55rem; }
+.card-meta time { color: var(--muted); }
 .guide-card .read { margin-top: auto; font-family: var(--mono); font-weight: 500; font-size: .74rem; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
 
-.cta-strip { text-align: center; padding: 3rem 0 1rem; }
-.cta-strip .eyebrow { font-family: var(--mono); font-weight: 500; font-size: .78rem; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
-.cta-strip .store-badge { margin-top: 1rem; }
-.about-note { font-family: var(--mono); font-weight: 500; font-size: .78rem; color: var(--muted); margin-top: 1.2rem; }
-.about-note a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+/* secondary app CTA */
+.cta-strip { text-align: center; padding: 2.5rem 0 1rem; margin-top: .5rem; border-top: 1px solid var(--line); }
+.cta-strip .eyebrow { font-family: var(--mono); font-weight: 500; font-size: .74rem; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-top: 2rem; display: block; }
+.cta-strip .cta-copy { color: var(--muted); font-size: .95rem; max-width: 34rem; margin: .7rem auto 1.2rem; }
+.cta-strip .store-badge { margin-top: .2rem; }
 
 /* ---------- responsive ---------- */
 @media (max-width: 900px) {

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Trade Business Guides: Pricing, Estimates &amp; Getting Paid</title>
-  <meta name="description" content="Plain-English guides for independent tradespeople on how to price jobs, set your hourly rate, mark up materials, and write estimates that win the work.">
+  <title>Trade Business Guides: Pricing, Rates &amp; Estimates</title>
+  <meta name="description" content="Plain-English guides for independent tradespeople on how to price jobs, set your hourly rate, mark up materials, and write estimates that win the work. Researched, sourced, and dated.">
   <link rel="canonical" href="https://gettradereadyapp.com/guides/">
   <meta name="apple-itunes-app" content="app-id=6790681059">
   <meta name="theme-color" content="#0c335e">
@@ -21,8 +21,22 @@
     "@context": "https://schema.org",
     "@type": "CollectionPage",
     "name": "Trade Business Guides",
-    "description": "Plain-English guides for independent tradespeople on pricing, rates, materials, and estimates.",
+    "description": "Plain-English guides for independent tradespeople, grouped into pricing fundamentals, estimates and customer communication, and pricing by trade.",
     "url": "https://gettradereadyapp.com/guides/",
+    "mainEntity": {
+      "@type": "ItemList",
+      "itemListOrder": "https://schema.org/ItemListOrderAscending",
+      "numberOfItems": 7,
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "How to price a job", "url": "https://gettradereadyapp.com/guides/how-to-price-a-job" },
+        { "@type": "ListItem", "position": 2, "name": "How much to charge per hour", "url": "https://gettradereadyapp.com/guides/how-much-to-charge-per-hour" },
+        { "@type": "ListItem", "position": 3, "name": "Markup vs. margin", "url": "https://gettradereadyapp.com/guides/markup-vs-margin" },
+        { "@type": "ListItem", "position": 4, "name": "What to put in a job estimate", "url": "https://gettradereadyapp.com/guides/job-estimate-template" },
+        { "@type": "ListItem", "position": 5, "name": "How much do plumbers charge per hour", "url": "https://gettradereadyapp.com/guides/how-much-do-plumbers-charge-per-hour" },
+        { "@type": "ListItem", "position": 6, "name": "How much do electricians charge per hour", "url": "https://gettradereadyapp.com/guides/how-much-do-electricians-charge-per-hour" },
+        { "@type": "ListItem", "position": 7, "name": "How much do HVAC techs charge per hour", "url": "https://gettradereadyapp.com/guides/how-much-do-hvac-techs-charge-per-hour" }
+      ]
+    },
     "hasPart": [
       { "@type": "Article", "headline": "How to Price a Job: The Complete Formula for Tradespeople", "url": "https://gettradereadyapp.com/guides/how-to-price-a-job" },
       { "@type": "Article", "headline": "How Much Should You Charge Per Hour?", "url": "https://gettradereadyapp.com/guides/how-much-to-charge-per-hour" },
@@ -81,65 +95,150 @@
   </div>
 
   <div class="wrap guides-wrap">
-    <ul class="guide-list">
+
+    <div class="research-note">
+      <span class="eyebrow">How these guides are researched</span>
+      <p>Written and reviewed by the TradeReady team in plain English. Market ranges are labeled as
+      estimates, wage facts are sourced to the U.S. Bureau of Labor Statistics, and every guide carries
+      a last-reviewed date. <a href="/guides/about">Read our research &amp; sourcing method &rarr;</a></p>
+    </div>
+
+    <section class="guide-section" aria-labelledby="sec-fundamentals">
+      <div class="section-head">
+        <h2 id="sec-fundamentals">Pricing fundamentals</h2>
+        <p>The core money math behind any trade. New to pricing? Start with the first one - the rest
+        build on it.</p>
+      </div>
+      <ul class="guide-list">
       <li class="guide-card">
-        <span class="kicker">Pricing · Start here</span>
-        <h2><a href="/guides/how-to-price-a-job">How to price a job</a></h2>
-        <p>The complete four-part formula - labor, materials, overhead, and profit - with a real job
-        priced end to end so you never guess a number again.</p>
-        <span class="read">Read the guide &rarr;</span>
+        <a class="card-link" href="/guides/how-to-price-a-job" aria-label="How to price a job">
+          <span class="kicker">Start here</span>
+          <h3>How to price a job</h3>
+          <p>The complete four-part formula - labor, materials, overhead, and profit - with a real job
+          priced end to end so you never guess a number again.</p>
+          <ul class="card-meta">
+            <li>Any trade</li>
+            <li>10 min read</li>
+            <li><time datetime="2026-08-19">Reviewed Aug 19, 2026</time></li>
+          </ul>
+          <span class="read">Read the guide &rarr;</span>
+        </a>
       </li>
       <li class="guide-card">
-        <span class="kicker">Pricing · Labor</span>
-        <h2><a href="/guides/how-much-to-charge-per-hour">How much to charge per hour</a></h2>
-        <p>The billable-hours math that turns the wage you want into an hourly rate that actually
-        covers your costs and pays you.</p>
-        <span class="read">Read the guide &rarr;</span>
+        <a class="card-link" href="/guides/how-much-to-charge-per-hour" aria-label="How much to charge per hour">
+          <span class="kicker">Your hourly rate</span>
+          <h3>How much to charge per hour</h3>
+          <p>The billable-hours math that turns the wage you want into an hourly rate that actually
+          covers your costs and pays you.</p>
+          <ul class="card-meta">
+            <li>Any trade</li>
+            <li>8 min read</li>
+            <li><time datetime="2026-08-19">Reviewed Aug 19, 2026</time></li>
+          </ul>
+          <span class="read">Read the guide &rarr;</span>
+        </a>
       </li>
       <li class="guide-card">
-        <span class="kicker">Pricing · Materials</span>
-        <h2><a href="/guides/markup-vs-margin">Markup vs. margin</a></h2>
-        <p>Why a 20% markup isn't a 20% margin, a conversion cheat sheet, and how much to add to
-        materials without quietly losing profit.</p>
-        <span class="read">Read the guide &rarr;</span>
+        <a class="card-link" href="/guides/markup-vs-margin" aria-label="Markup versus margin">
+          <span class="kicker">Materials</span>
+          <h3>Markup vs. margin</h3>
+          <p>Why a 20% markup isn't a 20% margin, a conversion cheat sheet, and how much to add to
+          materials without quietly losing profit.</p>
+          <ul class="card-meta">
+            <li>Any trade</li>
+            <li>7 min read</li>
+            <li><time datetime="2026-08-19">Reviewed Aug 19, 2026</time></li>
+          </ul>
+          <span class="read">Read the guide &rarr;</span>
+        </a>
+      </li>
+      </ul>
+    </section>
+
+    <section class="guide-section" aria-labelledby="sec-estimates">
+      <div class="section-head">
+        <h2 id="sec-estimates">Estimates and customer communication</h2>
+        <p>Turning your number into a written estimate the customer trusts - and that protects you when
+        the job changes.</p>
+      </div>
+      <ul class="guide-list">
+      <li class="guide-card">
+        <a class="card-link" href="/guides/job-estimate-template" aria-label="What to put in a job estimate">
+          <span class="kicker">Estimates</span>
+          <h3>What to put in a job estimate</h3>
+          <p>The nine parts every estimate needs, how to write scope that stops scope creep, and a
+          free template you can copy today.</p>
+          <ul class="card-meta">
+            <li>Any trade</li>
+            <li>8 min read</li>
+            <li><time datetime="2026-08-19">Reviewed Aug 19, 2026</time></li>
+          </ul>
+          <span class="read">Read the guide &rarr;</span>
+        </a>
+      </li>
+      </ul>
+    </section>
+
+    <section class="guide-section" aria-labelledby="sec-trade">
+      <div class="section-head">
+        <h2 id="sec-trade">Pricing by trade</h2>
+        <p>The same method applied trade by trade. These use broad US market checks as a rough
+        sanity-check - they are not local price lists, and your own costs and market always come first.</p>
+      </div>
+      <ul class="guide-list">
+      <li class="guide-card">
+        <a class="card-link" href="/guides/how-much-do-plumbers-charge-per-hour" aria-label="How much do plumbers charge per hour">
+          <span class="kicker">Plumbing</span>
+          <h3>How much do plumbers charge per hour</h3>
+          <p>The typical range for an independent plumber, why the rate looks high, and how to build
+          one from your own costs and a service-call fee.</p>
+          <ul class="card-meta">
+            <li>Plumbers</li>
+            <li>8 min read</li>
+            <li><time datetime="2026-08-19">Reviewed Aug 19, 2026</time></li>
+          </ul>
+          <span class="read">Read the guide &rarr;</span>
+        </a>
       </li>
       <li class="guide-card">
-        <span class="kicker">Estimates</span>
-        <h2><a href="/guides/job-estimate-template">What to put in a job estimate</a></h2>
-        <p>The nine parts every estimate needs, how to write scope that stops scope creep, and a
-        free template you can copy today.</p>
-        <span class="read">Read the guide &rarr;</span>
+        <a class="card-link" href="/guides/how-much-do-electricians-charge-per-hour" aria-label="How much do electricians charge per hour">
+          <span class="kicker">Electrical</span>
+          <h3>How much do electricians charge per hour</h3>
+          <p>What licensed electrical work really costs to deliver - permits, inspections, insurance -
+          and how to set a rate that covers all of it.</p>
+          <ul class="card-meta">
+            <li>Electricians</li>
+            <li>8 min read</li>
+            <li><time datetime="2026-08-19">Reviewed Aug 19, 2026</time></li>
+          </ul>
+          <span class="read">Read the guide &rarr;</span>
+        </a>
       </li>
       <li class="guide-card">
-        <span class="kicker">Pricing by trade · Plumbing</span>
-        <h2><a href="/guides/how-much-do-plumbers-charge-per-hour">How much do plumbers charge per hour</a></h2>
-        <p>The typical range for an independent plumber, why the rate looks high, and how to build
-        one from your own costs and a service-call fee.</p>
-        <span class="read">Read the guide &rarr;</span>
-      </li>
-      <li class="guide-card">
-        <span class="kicker">Pricing by trade · Electrical</span>
-        <h2><a href="/guides/how-much-do-electricians-charge-per-hour">How much do electricians charge per hour</a></h2>
-        <p>What licensed electrical work really costs to deliver - permits, inspections, insurance -
-        and how to set a rate that covers all of it.</p>
-        <span class="read">Read the guide &rarr;</span>
-      </li>
-      <li class="guide-card">
-        <span class="kicker">Pricing by trade · HVAC</span>
-        <h2><a href="/guides/how-much-do-hvac-techs-charge-per-hour">How much do HVAC techs charge per hour</a></h2>
-        <p>Hourly rates, why the diagnostic fee exists, and how the seasonal swing shapes what an
-        HVAC tech has to charge to get through the year.</p>
-        <span class="read">Read the guide &rarr;</span>
+        <a class="card-link" href="/guides/how-much-do-hvac-techs-charge-per-hour" aria-label="How much do HVAC techs charge per hour">
+          <span class="kicker">HVAC</span>
+          <h3>How much do HVAC techs charge per hour</h3>
+          <p>Hourly rates, why the diagnostic fee exists, and how the seasonal swing shapes what an
+          HVAC tech has to charge to get through the year.</p>
+          <ul class="card-meta">
+            <li>HVAC techs</li>
+            <li>8 min read</li>
+            <li><time datetime="2026-08-19">Reviewed Aug 19, 2026</time></li>
+          </ul>
+          <span class="read">Read the guide &rarr;</span>
+        </a>
       </li>
     </ul>
+    </section>
 
-    <div class="cta-strip">
-      <p class="eyebrow">Put it into practice</p>
+    <aside class="cta-strip" aria-label="Get the app">
+      <p class="eyebrow">Optional - put it into practice</p>
+      <p class="cta-copy">TradeReady runs this exact math for you on the job. The guides stand on their
+      own; the app is here if you want it.</p>
       <a class="store-badge" href="https://apps.apple.com/app/id6790681059" aria-label="Download TradeReady on the App Store">
         <img src="/images/app-store-badge.svg" alt="" width="120" height="40">
       </a>
-      <p class="about-note">New here? Read <a href="/guides/about">about how we research these guides</a>.</p>
-    </div>
+    </aside>
   </div>
 </main>
 
