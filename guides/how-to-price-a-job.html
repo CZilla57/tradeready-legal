@@ -22,10 +22,13 @@
     "@type": "Article",
     "headline": "How to Price a Job: The Complete Pricing Formula for Tradespeople",
     "description": "The four-part formula - labor, materials, overhead, and profit - to price any trade job so you stop guessing and stop underquoting.",
-    "author": { "@type": "Organization", "name": "TradeReady" },
+    "datePublished": "2026-08-18",
+    "dateModified": "2026-08-19",
+    "author": { "@type": "Organization", "name": "TradeReady", "url": "https://gettradereadyapp.com/guides/about" },
     "publisher": {
       "@type": "Organization",
       "name": "TradeReady",
+      "url": "https://gettradereadyapp.com/",
       "logo": { "@type": "ImageObject", "url": "https://gettradereadyapp.com/apple-touch-icon.png" }
     },
     "image": "https://gettradereadyapp.com/og-image.png",
@@ -66,155 +69,7 @@
     ]
   }
   </script>
-  <style>
-    @font-face { font-family: 'Chakra Petch'; src: url('/fonts/ChakraPetch-Bold.ttf') format('truetype'); font-weight: 700; font-display: swap; }
-    @font-face { font-family: 'Public Sans'; src: url('/fonts/PublicSans-Regular.ttf') format('truetype'); font-weight: 400; font-display: swap; }
-    @font-face { font-family: 'Public Sans'; src: url('/fonts/PublicSans-Medium.ttf') format('truetype'); font-weight: 500; font-display: swap; }
-    @font-face { font-family: 'Public Sans'; src: url('/fonts/PublicSans-SemiBold.ttf') format('truetype'); font-weight: 600; font-display: swap; }
-    @font-face { font-family: 'Public Sans'; src: url('/fonts/PublicSans-Bold.ttf') format('truetype'); font-weight: 700; font-display: swap; }
-    @font-face { font-family: 'IBM Plex Mono'; src: url('/fonts/IBMPlexMono-Medium.ttf') format('truetype'); font-weight: 500; font-display: swap; }
-
-    :root {
-      --bg: #f5f5f1;
-      --surface: #ffffff;
-      --ink: #14213d;
-      --muted: #666e7e;
-      --accent: #1d5c9e;
-      --accent-bg: #e4eef7;
-      --hero-navy: #0c335e;
-      --hero-ink: #f2f4f8;
-      --hero-line: rgba(242, 244, 248, .14);
-      --hero-muted: #9fb4cd;
-      --line: #d8dbe2;
-      --display: 'Chakra Petch', 'Segoe UI', sans-serif;
-      --body: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      --mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', monospace;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #101826;
-        --surface: #182238;
-        --ink: #f2f4f8;
-        --muted: #8b96a9;
-        --accent: #5b9bdb;
-        --accent-bg: #1b2c40;
-        --line: #2a3650;
-      }
-    }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body { font-family: var(--body); font-size: 17px; line-height: 1.65; color: var(--ink); background: var(--bg); }
-    img { max-width: 100%; display: block; }
-    a { color: var(--accent); }
-    :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
-
-    .skip-link { position: fixed; top: -100px; left: 1rem; z-index: 300; background: var(--surface); color: var(--accent); font-weight: 600; padding: .8rem 1.1rem; border: 2px solid var(--accent); border-radius: 8px; text-decoration: none; }
-    .skip-link:focus { top: .75rem; }
-
-    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 1.25rem; }
-
-    /* ---------- header (matches homepage) ---------- */
-    .topbar { position: sticky; top: 0; z-index: 100; background: var(--hero-navy); border-bottom: 1px solid var(--hero-line); }
-    @media (min-width: 721px) { html { scroll-padding-top: 5.25rem; } }
-    .nav { display: flex; align-items: center; gap: 1.5rem; padding: 1.1rem 0; }
-    .wordmark { font-family: var(--display); font-weight: 700; font-size: 1.35rem; letter-spacing: .02em; color: var(--hero-ink); text-decoration: none; }
-    .wordmark span { color: #f0a04b; }
-    .nav nav { display: flex; gap: 1.4rem; margin-left: auto; }
-    .nav nav a { color: var(--hero-muted); text-decoration: none; font-weight: 600; font-size: .95rem; padding: .6rem .25rem; }
-    .nav nav a:hover { color: var(--hero-ink); }
-    .nav .mini-cta { display: inline-block; padding: .45rem .95rem; border: 1px solid rgba(242,244,248,.35); border-radius: 8px; color: var(--hero-ink); text-decoration: none; font-weight: 600; font-size: .9rem; white-space: nowrap; }
-    .nav .mini-cta:hover { background: rgba(242,244,248,.1); }
-
-    /* ---------- article shell ---------- */
-    .article-head { background-color: var(--hero-navy);
-      background-image:
-        linear-gradient(var(--hero-line) 1px, transparent 1px),
-        linear-gradient(90deg, var(--hero-line) 1px, transparent 1px);
-      background-size: 24px 24px; color: var(--hero-ink); }
-    .article-head .wrap { padding-top: 2.75rem; padding-bottom: 3rem; }
-    .crumbs { font-family: var(--mono); font-weight: 500; font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--hero-muted); margin-bottom: 1.1rem; }
-    .crumbs a { color: var(--hero-muted); text-decoration: none; }
-    .crumbs a:hover { color: var(--hero-ink); }
-    .article-head .eyebrow { font-family: var(--mono); font-weight: 500; font-size: .78rem; letter-spacing: .18em; text-transform: uppercase; color: var(--hero-muted); }
-    .article-head h1 { font-family: var(--display); font-weight: 700; font-size: clamp(2rem, 5vw, 3rem); line-height: 1.13; letter-spacing: .005em; margin: .6rem 0 1rem; max-width: 22ch; }
-    .article-head .standfirst { font-size: 1.12rem; color: #c9d6e6; max-width: 40rem; }
-    .article-head .meta { font-family: var(--mono); font-weight: 500; font-size: .75rem; letter-spacing: .06em; color: var(--hero-muted); margin-top: 1.4rem; }
-
-    .prose { max-width: 42rem; margin: 0 auto; padding: 3rem 0 1rem; }
-    .prose h2 { font-family: var(--display); font-weight: 700; font-size: clamp(1.4rem, 3.4vw, 1.85rem); line-height: 1.22; margin: 2.6rem 0 .9rem; }
-    .prose h3 { font-family: var(--display); font-weight: 700; font-size: 1.2rem; margin: 1.8rem 0 .6rem; }
-    .prose p { margin-bottom: 1.15rem; }
-    .prose ul, .prose ol { margin: 0 0 1.3rem 0; padding-left: 0; list-style: none; }
-    .prose li { padding-left: 1.6rem; position: relative; margin-bottom: .65rem; }
-    .prose ul li::before { content: ''; position: absolute; left: 0; top: .55em; width: .85rem; height: 2px; background: var(--accent); }
-    .prose ol { counter-reset: item; }
-    .prose ol li { counter-increment: item; }
-    .prose ol li::before { content: counter(item); position: absolute; left: 0; top: .05em; font-family: var(--mono); font-weight: 500; font-size: .8rem; color: var(--accent); }
-    .prose strong { font-weight: 600; }
-    .prose a { text-decoration: underline; text-underline-offset: 2px; }
-    .lede { font-size: 1.15rem; }
-
-    /* formula / worked-example card */
-    .calc { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 1.6rem 1.7rem; margin: 1.6rem 0 1.9rem; font-family: var(--mono); font-weight: 500; font-size: .92rem; line-height: 1.9; }
-    .calc .row { display: flex; justify-content: space-between; gap: 1rem; }
-    .calc .row.rule { border-top: 1px solid var(--line); margin-top: .5rem; padding-top: .5rem; }
-    .calc .row.total { color: var(--accent); font-weight: 500; }
-    .calc .row span:last-child { white-space: nowrap; }
-    .calc .cap { font-family: var(--mono); font-size: .68rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: .8rem; }
-
-    .formula { font-family: var(--mono); font-weight: 500; background: var(--accent-bg); color: var(--ink); border-radius: 10px; padding: 1rem 1.2rem; margin: 1.3rem 0; font-size: 1rem; text-align: center; }
-
-    .callout { border-left: 3px solid var(--accent); background: var(--accent-bg); border-radius: 0 10px 10px 0; padding: 1.1rem 1.3rem; margin: 1.6rem 0; }
-    .callout p:last-child { margin-bottom: 0; }
-    .callout .tag { font-family: var(--mono); font-weight: 500; font-size: .68rem; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); display: block; margin-bottom: .4rem; }
-
-    /* app tie-in strip */
-    .app-strip { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 2rem 1.8rem; margin: 2.4rem 0; text-align: center; }
-    .app-strip h2 { margin-top: 0; }
-    .app-strip p { color: var(--muted); max-width: 32rem; margin: 0 auto 1.3rem; }
-    .store-badge { display: inline-block; line-height: 0; border-radius: 10px; }
-    .store-badge svg { height: 50px; width: auto; }
-    .trial-note { display: block; font-family: var(--mono); font-weight: 500; font-size: .74rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-top: .9rem; }
-
-    /* related */
-    .related { border-top: 1px solid var(--line); margin-top: 2.5rem; padding-top: 1.8rem; }
-    .related .eyebrow { font-family: var(--mono); font-weight: 500; font-size: .74rem; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
-    .related ul { list-style: none; margin-top: .9rem; padding: 0; }
-    .related li { margin-bottom: .7rem; }
-    .related a { font-weight: 600; text-decoration: none; }
-    .related a:hover { text-decoration: underline; }
-
-    /* ---------- footer (matches homepage) ---------- */
-    footer { border-top: 2px solid var(--ink); margin-top: 3.5rem; }
-    .tblock { display: grid; grid-template-columns: repeat(4, 1fr); border-left: 1px solid var(--line); border-right: 1px solid var(--line); }
-    .tcell { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: .9rem 1.1rem; min-height: 5.2rem; min-width: 0; }
-    .tcell .v, .tcell a { overflow-wrap: anywhere; }
-    .tcell:nth-child(4n) { border-right: none; }
-    .tcell .k { font-family: var(--mono); font-weight: 500; font-size: .66rem; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: .3rem; }
-    .tcell .v { font-size: .92rem; font-weight: 600; }
-    .tcell a { text-decoration: none; display: inline-block; padding: .65rem 0; margin: -.45rem 0; }
-    .tcell a:hover { text-decoration: underline; }
-    .colophon { font-size: .82rem; color: var(--muted); padding: 1rem 0 2.2rem; text-align: center; }
-
-    @media (max-width: 900px) {
-      .tblock { grid-template-columns: repeat(2, 1fr); }
-      .tcell:nth-child(2n), .tcell:nth-child(4n) { border-right: none; }
-    }
-    @media (max-width: 720px) {
-      .topbar { position: static; }
-      .nav { flex-wrap: wrap; gap: .3rem 1.5rem; padding: .85rem 0; }
-      .nav nav { order: 3; flex-basis: 100%; margin-left: 0; }
-      .nav nav a { padding: .6rem 0; }
-      .nav .mini-cta { margin-left: auto; }
-      .prose { padding-top: 2.25rem; }
-    }
-    @media (max-width: 480px) {
-      .tblock { grid-template-columns: 1fr; }
-      .tcell { border-right: none; min-height: 0; }
-      .calc { padding: 1.3rem 1.2rem; }
-    }
-  </style>
+  <link rel="stylesheet" href="/guides/guides.css">
 </head>
 <body>
 
@@ -246,7 +101,12 @@
       <h1>How to price a job: the complete formula for tradespeople</h1>
       <p class="standfirst">Four parts go into every price you quote - labor, materials,
       overhead, and profit. Get the formula right once and you never guess a number again.</p>
-      <p class="meta">10 min read · For independent tradespeople</p>
+      <div class="byline">
+        <span>By the <a href="/guides/about">TradeReady team</a></span>
+        <span><time datetime="2026-08-18">Published Aug 18, 2026</time></span>
+        <span><time datetime="2026-08-19">Last reviewed Aug 19, 2026</time></span>
+        <span>10 min read</span>
+      </div>
     </div>
   </div>
 
@@ -342,15 +202,18 @@
     We'll use a $40/hr take-home wage, $20/hr overhead (from above), a 25% materials markup, and a
     25% profit margin.</p>
 
-    <div class="calc" role="table" aria-label="Worked pricing example">
-      <span class="cap">Vanity &amp; faucet swap · ~5 hours</span>
-      <div class="row"><span>Labor - 5 hrs &times; $40 wage</span><span>$200.00</span></div>
-      <div class="row"><span>Overhead - 5 hrs &times; $20</span><span>$100.00</span></div>
-      <div class="row"><span>Materials - $390 cost + 25% markup</span><span>$487.50</span></div>
-      <div class="row rule total"><span>Total cost (break-even)</span><span>$787.50</span></div>
-      <div class="row" style="margin-top:.6rem"><span>Price = $787.50 &divide; (1 &minus; 0.25)</span><span>$1,050.00</span></div>
-      <div class="row total"><span>Your profit on the job</span><span>$262.50</span></div>
+    <div class="calc">
+      <table>
+        <caption>Vanity &amp; faucet swap · ~5 hours</caption>
+        <tbody>
+          <tr><th scope="row">Labor - 5 hrs &times; $40 wage</th><td>$200.00</td></tr>
+          <tr><th scope="row">Overhead - 5 hrs &times; $20</th><td>$100.00</td></tr>
+          <tr><th scope="row">Materials - $390 cost + 25% markup</th><td>$487.50</td></tr>
+          <tr class="total"><th scope="row">Your profit on the job</th><td>$262.50</td></tr>
+        </tbody>
+      </table>
     </div>
+    <p class="est-note">Illustrative example &mdash; figures chosen to show the method, not a quote. <a href="/guides/about#methodology">How we source figures</a>.</p>
 
     <p>So you quote <strong>$1,050</strong>. Your wage of $200 is paid, your overhead of $100 is
     covered, your materials are paid back with a fair markup, and the business clears $262.50 in
@@ -374,12 +237,7 @@
       and it stacks up the cost, applies your margin, and warns you the moment a quote drops below
       break-even - so you never send a number that costs you money.</p>
       <a class="store-badge" href="https://apps.apple.com/app/id6790681059" aria-label="Download TradeReady on the App Store">
-        <svg viewBox="0 0 180 53" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
-          <rect x=".5" y=".5" width="179" height="52" rx="9.5" fill="#000" stroke="#a6a6a6"/>
-          <path fill="#fff" d="M36.6 26.9c0-3.3 2.7-4.9 2.8-5-1.5-2.2-3.9-2.5-4.7-2.6-2-.2-3.9 1.2-4.9 1.2-1 0-2.6-1.2-4.3-1.1-2.2 0-4.2 1.3-5.3 3.2-2.3 3.9-.6 9.7 1.6 12.9 1.1 1.6 2.4 3.3 4.1 3.2 1.6-.1 2.3-1 4.2-1 2 0 2.5 1 4.3 1 1.8 0 2.9-1.6 4-3.2 1.3-1.8 1.8-3.6 1.8-3.7-.1 0-3.5-1.3-3.6-4.9zM33.4 17.2c.9-1.1 1.5-2.6 1.3-4.1-1.3.1-2.9.9-3.8 1.9-.8.9-1.6 2.5-1.4 3.9 1.5.1 3-.7 3.9-1.7z"/>
-          <text x="48" y="22" fill="#fff" font-family="'Public Sans', 'Segoe UI', sans-serif" font-size="10.5">Download on the</text>
-          <text x="48" y="40" fill="#fff" font-family="'Public Sans', 'Segoe UI', sans-serif" font-size="16.5" font-weight="600">App Store</text>
-        </svg>
+        <img src="/images/app-store-badge.svg" alt="" width="120" height="40">
       </a>
       <span class="trial-note">Free to download · 2-week free trial</span>
     </div>
@@ -405,6 +263,33 @@
     Divide by one minus your margin to find your price. Never cross break-even. Do that on every
     job and you'll stop guessing, stop working for free, and start running a business that actually
     pays you.</p>
+
+    <section class="faq" aria-labelledby="faq-heading">
+      <h2 id="faq-heading">Common questions</h2>
+
+      <h3>What is the formula for pricing a job?</h3>
+      <p>Add up the true cost of the job - labor (your hours × loaded rate), materials, and the share of overhead the job should carry - then divide that total cost by (1 minus your target profit margin). The result is your price. Cost ÷ (1 − margin) = price.</p>
+
+      <h3>How much profit should I add to a job?</h3>
+      <p>Most solo trades aim for a net profit margin of 10–30% on top of a price that already pays them a fair wage and covers overhead. Profit is what is left after you have paid yourself, not your wage itself.</p>
+
+      <h3>What is the difference between break-even and profit?</h3>
+      <p>Break-even is the price at which the job costs you nothing and earns you nothing - labor, materials, and overhead are covered but there is zero profit. Any price below break-even means you are paying to do the job. Profit is what you charge above break-even.</p>
+    </section>
+
+    <section class="sources" aria-labelledby="sources-heading">
+      <span class="eyebrow" id="sources-heading">Sources &amp; notes</span>
+      <ul>
+        <li>The worked example above uses illustrative figures chosen to make the method clear, not a quote for any real job. See <a href="/guides/about#methodology">how we research these guides</a>.</li>
+      </ul>
+    </section>
+
+    <div class="disclaimer">
+      <strong>Educational, not advice.</strong> Figures in this guide are illustrative and vary
+      by location, job type, and market conditions, and business, tax, contract, and licensing
+      requirements vary by jurisdiction. This guide is educational and isn't legal, tax, or
+      accounting advice. <a href="/guides/about">How we research these guides</a>.
+    </div>
 
     <div class="related">
       <span class="eyebrow">Keep reading</span>
