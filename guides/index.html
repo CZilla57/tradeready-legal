@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trade Business Guides: Pricing, Estimates &amp; Getting Paid</title>
+  <meta name="description" content="Plain-English guides for independent tradespeople on how to price jobs, set your hourly rate, mark up materials, and write estimates that win the work.">
+  <link rel="canonical" href="https://gettradereadyapp.com/guides/">
+  <meta name="apple-itunes-app" content="app-id=6790681059">
+  <meta name="theme-color" content="#0c335e">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta property="og:title" content="Trade Business Guides - TradeReady">
+  <meta property="og:description" content="How to price jobs, set your rate, mark up materials, and write estimates that win. Plain-English guides for tradespeople.">
+  <meta property="og:image" content="https://gettradereadyapp.com/og-image.png">
+  <meta property="og:url" content="https://gettradereadyapp.com/guides/">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Trade Business Guides",
+    "description": "Plain-English guides for independent tradespeople on pricing, rates, materials, and estimates.",
+    "url": "https://gettradereadyapp.com/guides/",
+    "hasPart": [
+      { "@type": "Article", "headline": "How to Price a Job: The Complete Formula for Tradespeople", "url": "https://gettradereadyapp.com/guides/how-to-price-a-job" },
+      { "@type": "Article", "headline": "How Much Should You Charge Per Hour?", "url": "https://gettradereadyapp.com/guides/how-much-to-charge-per-hour" },
+      { "@type": "Article", "headline": "Markup vs. Margin: How to Price Materials", "url": "https://gettradereadyapp.com/guides/markup-vs-margin" },
+      { "@type": "Article", "headline": "What to Put in a Job Estimate (+ Free Template)", "url": "https://gettradereadyapp.com/guides/job-estimate-template" }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://gettradereadyapp.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Guides", "item": "https://gettradereadyapp.com/guides/" }
+    ]
+  }
+  </script>
+  <style>
+    @font-face { font-family: 'Chakra Petch'; src: url('/fonts/ChakraPetch-Bold.ttf') format('truetype'); font-weight: 700; font-display: swap; }
+    @font-face { font-family: 'Public Sans'; src: url('/fonts/PublicSans-Regular.ttf') format('truetype'); font-weight: 400; font-display: swap; }
+    @font-face { font-family: 'Public Sans'; src: url('/fonts/PublicSans-Medium.ttf') format('truetype'); font-weight: 500; font-display: swap; }
+    @font-face { font-family: 'Public Sans'; src: url('/fonts/PublicSans-SemiBold.ttf') format('truetype'); font-weight: 600; font-display: swap; }
+    @font-face { font-family: 'Public Sans'; src: url('/fonts/PublicSans-Bold.ttf') format('truetype'); font-weight: 700; font-display: swap; }
+    @font-face { font-family: 'IBM Plex Mono'; src: url('/fonts/IBMPlexMono-Medium.ttf') format('truetype'); font-weight: 500; font-display: swap; }
+
+    :root {
+      --bg: #f5f5f1;
+      --surface: #ffffff;
+      --ink: #14213d;
+      --muted: #666e7e;
+      --accent: #1d5c9e;
+      --accent-bg: #e4eef7;
+      --hero-navy: #0c335e;
+      --hero-ink: #f2f4f8;
+      --hero-line: rgba(242, 244, 248, .14);
+      --hero-muted: #9fb4cd;
+      --line: #d8dbe2;
+      --display: 'Chakra Petch', 'Segoe UI', sans-serif;
+      --body: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', monospace;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #101826;
+        --surface: #182238;
+        --ink: #f2f4f8;
+        --muted: #8b96a9;
+        --accent: #5b9bdb;
+        --accent-bg: #1b2c40;
+        --line: #2a3650;
+      }
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--body); font-size: 17px; line-height: 1.65; color: var(--ink); background: var(--bg); }
+    a { color: var(--accent); }
+    :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+
+    .skip-link { position: fixed; top: -100px; left: 1rem; z-index: 300; background: var(--surface); color: var(--accent); font-weight: 600; padding: .8rem 1.1rem; border: 2px solid var(--accent); border-radius: 8px; text-decoration: none; }
+    .skip-link:focus { top: .75rem; }
+
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 1.25rem; }
+
+    .topbar { position: sticky; top: 0; z-index: 100; background: var(--hero-navy); border-bottom: 1px solid var(--hero-line); }
+    @media (min-width: 721px) { html { scroll-padding-top: 5.25rem; } }
+    .nav { display: flex; align-items: center; gap: 1.5rem; padding: 1.1rem 0; }
+    .wordmark { font-family: var(--display); font-weight: 700; font-size: 1.35rem; letter-spacing: .02em; color: var(--hero-ink); text-decoration: none; }
+    .wordmark span { color: #f0a04b; }
+    .nav nav { display: flex; gap: 1.4rem; margin-left: auto; }
+    .nav nav a { color: var(--hero-muted); text-decoration: none; font-weight: 600; font-size: .95rem; padding: .6rem .25rem; }
+    .nav nav a:hover { color: var(--hero-ink); }
+    .nav .mini-cta { display: inline-block; padding: .45rem .95rem; border: 1px solid rgba(242,244,248,.35); border-radius: 8px; color: var(--hero-ink); text-decoration: none; font-weight: 600; font-size: .9rem; white-space: nowrap; }
+    .nav .mini-cta:hover { background: rgba(242,244,248,.1); }
+
+    .article-head { background-color: var(--hero-navy);
+      background-image:
+        linear-gradient(var(--hero-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--hero-line) 1px, transparent 1px);
+      background-size: 24px 24px; color: var(--hero-ink); }
+    .article-head .wrap { padding-top: 2.75rem; padding-bottom: 3rem; }
+    .crumbs { font-family: var(--mono); font-weight: 500; font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--hero-muted); margin-bottom: 1.1rem; }
+    .crumbs a { color: var(--hero-muted); text-decoration: none; }
+    .crumbs a:hover { color: var(--hero-ink); }
+    .article-head .eyebrow { font-family: var(--mono); font-weight: 500; font-size: .78rem; letter-spacing: .18em; text-transform: uppercase; color: var(--hero-muted); }
+    .article-head h1 { font-family: var(--display); font-weight: 700; font-size: clamp(2rem, 5vw, 3rem); line-height: 1.13; letter-spacing: .005em; margin: .6rem 0 1rem; max-width: 24ch; }
+    .article-head .standfirst { font-size: 1.12rem; color: #c9d6e6; max-width: 40rem; }
+
+    .guides-wrap { padding: 3rem 0 1rem; }
+    .guide-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; list-style: none; }
+    .guide-card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 1.6rem 1.7rem; display: flex; flex-direction: column; transition: border-color .15s ease, transform .15s ease; }
+    .guide-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .guide-card .kicker { font-family: var(--mono); font-weight: 500; font-size: .68rem; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin-bottom: .6rem; }
+    .guide-card h2 { font-family: var(--display); font-weight: 700; font-size: 1.3rem; line-height: 1.2; margin-bottom: .5rem; }
+    .guide-card h2 a { color: var(--ink); text-decoration: none; }
+    .guide-card h2 a::after { content: ''; position: absolute; inset: 0; }
+    .guide-card { position: relative; }
+    .guide-card p { color: var(--muted); font-size: .96rem; margin-bottom: 1rem; }
+    .guide-card .read { margin-top: auto; font-family: var(--mono); font-weight: 500; font-size: .74rem; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
+
+    .cta-strip { text-align: center; padding: 3rem 0 1rem; }
+    .cta-strip .eyebrow { font-family: var(--mono); font-weight: 500; font-size: .78rem; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
+    .store-badge { display: inline-block; line-height: 0; border-radius: 10px; margin-top: 1rem; }
+    .store-badge svg { height: 50px; width: auto; }
+
+    footer { border-top: 2px solid var(--ink); margin-top: 3.5rem; }
+    .tblock { display: grid; grid-template-columns: repeat(4, 1fr); border-left: 1px solid var(--line); border-right: 1px solid var(--line); }
+    .tcell { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: .9rem 1.1rem; min-height: 5.2rem; min-width: 0; }
+    .tcell .v, .tcell a { overflow-wrap: anywhere; }
+    .tcell:nth-child(4n) { border-right: none; }
+    .tcell .k { font-family: var(--mono); font-weight: 500; font-size: .66rem; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: .3rem; }
+    .tcell .v { font-size: .92rem; font-weight: 600; }
+    .tcell a { text-decoration: none; display: inline-block; padding: .65rem 0; margin: -.45rem 0; }
+    .tcell a:hover { text-decoration: underline; }
+    .colophon { font-size: .82rem; color: var(--muted); padding: 1rem 0 2.2rem; text-align: center; }
+
+    @media (max-width: 720px) {
+      .topbar { position: static; }
+      .nav { flex-wrap: wrap; gap: .3rem 1.5rem; padding: .85rem 0; }
+      .nav nav { order: 3; flex-basis: 100%; margin-left: 0; }
+      .nav nav a { padding: .6rem 0; }
+      .nav .mini-cta { margin-left: auto; }
+      .guide-list { grid-template-columns: 1fr; }
+      .tblock { grid-template-columns: repeat(2, 1fr); }
+      .tcell:nth-child(2n), .tcell:nth-child(4n) { border-right: none; }
+    }
+    @media (max-width: 480px) {
+      .tblock { grid-template-columns: 1fr; }
+      .tcell { border-right: none; min-height: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="nav">
+      <a class="wordmark" href="/">TradeReady<span>.</span></a>
+      <nav aria-label="Site">
+        <a href="/#features">Features</a>
+        <a href="/#pricing">Pricing</a>
+        <a href="/support.html">Support</a>
+      </nav>
+      <a class="mini-cta" href="https://apps.apple.com/app/id6790681059">Get the app</a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <div class="article-head">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <a href="/">Home</a> / Guides
+      </nav>
+      <span class="eyebrow">Guides</span>
+      <h1>Running the business side of your trade</h1>
+      <p class="standfirst">Plain-English guides on pricing, rates, materials, and estimates - the
+      business skills nobody teaches you on the tools. No jargon, real examples, written for
+      independent tradespeople.</p>
+    </div>
+  </div>
+
+  <div class="wrap guides-wrap">
+    <ul class="guide-list">
+      <li class="guide-card">
+        <span class="kicker">Pricing · Start here</span>
+        <h2><a href="/guides/how-to-price-a-job">How to price a job</a></h2>
+        <p>The complete four-part formula - labor, materials, overhead, and profit - with a real job
+        priced end to end so you never guess a number again.</p>
+        <span class="read">Read the guide &rarr;</span>
+      </li>
+      <li class="guide-card">
+        <span class="kicker">Pricing · Labor</span>
+        <h2><a href="/guides/how-much-to-charge-per-hour">How much to charge per hour</a></h2>
+        <p>The billable-hours math that turns the wage you want into an hourly rate that actually
+        covers your costs and pays you.</p>
+        <span class="read">Read the guide &rarr;</span>
+      </li>
+      <li class="guide-card">
+        <span class="kicker">Pricing · Materials</span>
+        <h2><a href="/guides/markup-vs-margin">Markup vs. margin</a></h2>
+        <p>Why a 20% markup isn't a 20% margin, a conversion cheat sheet, and how much to add to
+        materials without quietly losing profit.</p>
+        <span class="read">Read the guide &rarr;</span>
+      </li>
+      <li class="guide-card">
+        <span class="kicker">Estimates</span>
+        <h2><a href="/guides/job-estimate-template">What to put in a job estimate</a></h2>
+        <p>The nine parts every estimate needs, how to write scope that stops scope creep, and a
+        free template you can copy today.</p>
+        <span class="read">Read the guide &rarr;</span>
+      </li>
+    </ul>
+
+    <div class="cta-strip">
+      <p class="eyebrow">Put it into practice</p>
+      <a class="store-badge" href="https://apps.apple.com/app/id6790681059" aria-label="Download TradeReady on the App Store">
+        <svg viewBox="0 0 180 53" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
+          <rect x=".5" y=".5" width="179" height="52" rx="9.5" fill="#000" stroke="#a6a6a6"/>
+          <path fill="#fff" d="M36.6 26.9c0-3.3 2.7-4.9 2.8-5-1.5-2.2-3.9-2.5-4.7-2.6-2-.2-3.9 1.2-4.9 1.2-1 0-2.6-1.2-4.3-1.1-2.2 0-4.2 1.3-5.3 3.2-2.3 3.9-.6 9.7 1.6 12.9 1.1 1.6 2.4 3.3 4.1 3.2 1.6-.1 2.3-1 4.2-1 2 0 2.5 1 4.3 1 1.8 0 2.9-1.6 4-3.2 1.3-1.8 1.8-3.6 1.8-3.7-.1 0-3.5-1.3-3.6-4.9zM33.4 17.2c.9-1.1 1.5-2.6 1.3-4.1-1.3.1-2.9.9-3.8 1.9-.8.9-1.6 2.5-1.4 3.9 1.5.1 3-.7 3.9-1.7z"/>
+          <text x="48" y="22" fill="#fff" font-family="'Public Sans', 'Segoe UI', sans-serif" font-size="10.5">Download on the</text>
+          <text x="48" y="40" fill="#fff" font-family="'Public Sans', 'Segoe UI', sans-serif" font-size="16.5" font-weight="600">App Store</text>
+        </svg>
+      </a>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="tblock" role="contentinfo">
+      <div class="tcell"><span class="k">Project</span><span class="v">TradeReady</span></div>
+      <div class="tcell"><span class="k">Client</span><span class="v">Independent tradespeople</span></div>
+      <div class="tcell"><span class="k">Support</span><span class="v"><a href="/support.html">Help &amp; FAQ</a></span></div>
+      <div class="tcell"><span class="k">Contact</span><span class="v"><a href="mailto:support@gettradereadyapp.com">support@gettradereadyapp.com</a></span></div>
+      <div class="tcell"><span class="k">Privacy</span><span class="v"><a href="/privacy.html">Privacy Policy</a></span></div>
+      <div class="tcell"><span class="k">Terms</span><span class="v"><a href="/terms.html">Terms of Service</a></span></div>
+      <div class="tcell"><span class="k">Platform</span><span class="v">iPhone, App Store</span></div>
+      <div class="tcell"><span class="k">Home</span><span class="v"><a href="/">gettradereadyapp.com</a></span></div>
+    </div>
+    <p class="colophon">© 2026 Chad Rector. TradeReady is not affiliated with Apple Inc.</p>
+  </div>
+</footer>
+
+</body>
+</html>
