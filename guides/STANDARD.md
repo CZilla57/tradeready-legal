@@ -211,5 +211,8 @@ it is silently blocked.
 - [ ] No horizontal overflow at 375px; footer/nav collapse correctly.
 - [ ] Skip-link works; `:focus-visible` visible; no positive `tabindex`.
 - [ ] All internal links resolve.
-- [ ] Add the URL to `/sitemap.xml` (extensionless).
+- [ ] Add the URL to `/sitemap.xml` (extensionless), with a `<lastmod>` that
+  matches the guide's `dateModified` (§5). When you bump a guide's
+  `dateModified`/`Last reviewed`, update its `<lastmod>` in the sitemap in the
+  same change — the values are hand-maintained and don't sync automatically.
 - [ ] No invented rates, stats, credentials, research, or capabilities.
