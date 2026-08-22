@@ -5,7 +5,7 @@ Not a published page (unlinked, not in the sitemap). The public expression of
 these rules lives in [`about.html`](about.html); this file is the contributor
 checklist behind it.
 
-Last updated: 2026-08-19.
+Last updated: 2026-08-22.
 
 ---
 
@@ -41,6 +41,17 @@ Rules that follow from this:
   For US trade wages, link the BLS Occupational Outlook Handbook (§7). Note that
   BLS reports *employee wages*, which differ from a self-employed billing rate —
   don't conflate them.
+- **Product claims match shipped code.** Only claim what the app does today:
+  true-margin calc, break-even, low/recommended/high range, minimum job fee,
+  materials markup, pricebook reuse, estimate/invoice creation. Recurring
+  schedules **generate invoice records/drafts on a cadence** — they do not send or
+  collect automatically; sending and payment collection are separate steps. Never
+  imply automatic invoice sending, automatic collection, or guaranteed profit.
+- **Free-trial wording carries no fixed duration.** The paywall derives the trial
+  length from the store's intro offer at runtime and shows trial copy only to
+  eligible users (`paywallCopy.ts`; hardcoding "14-day" is a 2.3.1 misleading-claims
+  risk). Guides say **"free trial for eligible new subscribers"** — never a specific
+  number of days/weeks.
 
 ## 3. Page skeleton
 
@@ -106,6 +117,24 @@ Directly under any table of numbers, add a one-line note linking the methodology
   method, not a quote. <a href="/guides/about#methodology">How we source figures</a>.</p>
   ```
 
+**Worked-example math must match the app's pricing engine** (`tradeready/utils/pricingEngine.ts`).
+When a worked example claims "TradeReady runs this exact math," every row must
+reproduce through the shipped formula:
+
+- `materialCost = baseMaterialCost × (1 + materialMarkupPercent)`
+- `subtotal = labor + marked-up materials + travel`
+- **`overhead = subtotal × overheadPercent`** — overhead is a **percentage of the
+  subtotal**, never dollars per hour. Do not write `$X/hr overhead` rows; the app
+  has no such input.
+- `costBasis = subtotal + overhead`
+- `price = costBasis ÷ (1 − marginPercent)` (true margin; margin capped at 99%)
+- `profit = price − costBasis`
+
+Present the overhead percentage as an **allocation for running costs, not a
+measured bill**, and keep the target pricing margin distinct from realized net
+profit. Run every example through the engine (or an equivalent deterministic
+check) before publishing — do not eyeball it.
+
 ## 7. Sources & notes + disclaimer
 
 Near the end of the article, before "Keep reading":
@@ -139,6 +168,20 @@ Verified primary sources for the trade guides (BLS Occupational Outlook Handbook
 
 BLS deep OEWS `/oes/current/oes*.htm` links redirect and are **not** stable —
 use the OOH pages above. Re-check any external URL before publishing.
+
+Verified primary sources for the trade *pricing* guides (browse-checked 2026-08-22):
+
+| Claim | Source | URL |
+|-------|--------|-----|
+| Paint coverage (≈350–400 sq ft/gal; varies by surface/method) | Sherwin-Williams paint calculator | `https://www.sherwin-williams.com/en-us/color/color-tools/paint-calculator` |
+| Drywall levels of finish (0–5) | Gypsum Association GA-214 (free download) | `https://gypsum.org/2022/02/revised-levels-of-finish-for-gypsum-panel-products-released/` |
+| Joint-compound drying/recoat (~24 h at 70°F/70% RH) | USG FAQ | `https://assemblies-tools.usg.com/content/usgcom/en/resource-center/faqs/73.html` |
+| Flooring subfloor must be sound/dry/clean/flat | Armstrong Flooring subfloor-prep FAQ | `https://www.armstrongflooring.com/commercial/en-us/resources/flooring-faqs/subfloor-prep-faqs.html` |
+
+These are hyperlinks (navigations), not loaded sub-resources, so they do **not**
+need adding to the `_headers` CSP allowlist (§11). Licensing, permits, warranties,
+and insurance for the trades are jurisdiction- and business-dependent — keep them
+neutral and never invent a specific requirement.
 
 ## 8. FAQ — visible + structured must match
 
