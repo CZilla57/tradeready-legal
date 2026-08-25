@@ -5,7 +5,7 @@ Not a published page (unlinked, not in the sitemap). The public expression of
 these rules lives in [`about.html`](about.html); this file is the contributor
 checklist behind it.
 
-Last updated: 2026-08-22.
+Last updated: 2026-08-24.
 
 ---
 
@@ -43,10 +43,19 @@ Rules that follow from this:
   don't conflate them.
 - **Product claims match shipped code.** Only claim what the app does today:
   true-margin calc, break-even, low/recommended/high range, minimum job fee,
-  materials markup, pricebook reuse, estimate/invoice creation. Recurring
-  schedules **generate invoice records/drafts on a cadence** — they do not send or
-  collect automatically; sending and payment collection are separate steps. Never
-  imply automatic invoice sending, automatic collection, or guaranteed profit.
+  materials markup, pricebook reuse, estimate/invoice creation, **direct-cost
+  lines** (permits/disposal/rental/subcontractor/delivery, each either priced into
+  the job so it earns overhead + margin, or passed through at cost with no markup —
+  permits pass through by default), an optional **labor-time breakdown** (on-site /
+  drive / supply-run / setup buckets that sum to billable hours, plus a
+  non-billable drying/curing note that is never charged), trade-aware **pricebook
+  templates** (a scope checklist + blank placeholder lines — never any figures),
+  and **job profitability** that measures against estimated direct costs. On
+  recurring: schedules **generate each invoice on a cadence**; auto-emailing of
+  recurring invoices is an **opt-in** feature that is **off by default** and
+  requires two toggles (the per-plan one and the master Settings one). Payment
+  collection is always a separate step. Never imply auto-send is on by default,
+  automatic collection, or guaranteed profit.
 - **Free-trial wording carries no fixed duration.** The paywall derives the trial
   length from the store's intro offer at runtime and shows trial copy only to
   eligible users (`paywallCopy.ts`; hardcoding "14-day" is a 2.3.1 misleading-claims
@@ -129,6 +138,21 @@ reproduce through the shipped formula:
 - `costBasis = subtotal + overhead`
 - `price = costBasis ÷ (1 − marginPercent)` (true margin; margin capped at 99%)
 - `profit = price − costBasis`
+
+**Direct-cost lines** (permits, disposal, rental, subcontractor, delivery) enter
+the price by their `markupPolicy`:
+
+- **`in_margin_base`** — the line's amount (`qty × unitCost × (1 + lineMarkup)`)
+  joins the `subtotal` alongside labor and marked-up materials, so it earns
+  overhead and margin. Show it as a row *above* the Subtotal line.
+- **`passthrough`** — added at cost (`qty × unitCost`, no markup) *after* the
+  margin divide, so it is reimbursed exactly. Show it as a row *below* the margined
+  price and *above* the final total. Permits pass through by default.
+
+So a job with a pass-through permit reads: … → Cost basis → margined price
+(`costBasis ÷ (1 − margin)`) → permit at cost → Price you quote. Run any example
+with direct-cost rows through `calculateEstimate` (pass `jobCosts`) before
+publishing — the plumbing and electrical guides show both policies in one table.
 
 Present the overhead percentage as an **allocation for running costs, not a
 measured bill**, and keep the target pricing margin distinct from realized net
