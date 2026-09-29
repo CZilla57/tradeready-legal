@@ -262,7 +262,7 @@ CSP note: the site's `_headers` allows `img-src 'self' data:`, `font-src 'self'`
 all fine. **Any new external host must be added to the `_headers` allowlist** or
 it is silently blocked.
 
-## 13. SEO metadata
+## 12. SEO metadata
 
 Applies to every guide (added 2026-09-29 after a site-wide audit).
 
@@ -285,7 +285,7 @@ Applies to every guide (added 2026-09-29 after a site-wide audit).
   "Last reviewed", `dateModified`, `article:modified_time`, and the sitemap
   `<lastmod>`. Also update its "Reviewed" date on the `index.html` card.
 
-## 12. Pre-publish checklist
+## 13. Pre-publish checklist
 
 - [ ] Links `guides.css`; no inline `<style>`.
 - [ ] Byline present with truthful Published + Last-reviewed dates.
@@ -305,6 +305,6 @@ Applies to every guide (added 2026-09-29 after a site-wide audit).
   matches the guide's `dateModified` (§5). When you bump a guide's
   `dateModified`/`Last reviewed`, update its `<lastmod>` in the sitemap in the
   same change — the values are hand-maintained and don't sync automatically.
-- [ ] Title ≤ 60 and description 120-160 characters (decoded); social/robots tags present (§13).
+- [ ] Title ≤ 60 and description 120-160 characters (decoded); social/robots tags present (§12).
 - [ ] At least three inbound internal links; card added to `index.html`.
 - [ ] No invented rates, stats, credentials, research, or capabilities.
