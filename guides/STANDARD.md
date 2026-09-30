@@ -5,7 +5,7 @@ Not a published page (unlinked, not in the sitemap). The public expression of
 these rules lives in [`about.html`](about.html); this file is the contributor
 checklist behind it.
 
-Last updated: 2026-08-24.
+Last updated: 2026-09-29.
 
 ---
 
@@ -262,7 +262,30 @@ CSP note: the site's `_headers` allows `img-src 'self' data:`, `font-src 'self'`
 all fine. **Any new external host must be added to the `_headers` allowlist** or
 it is silently blocked.
 
-## 12. Pre-publish checklist
+## 12. SEO metadata
+
+Applies to every guide (added 2026-09-29 after a site-wide audit).
+
+- **`<title>` ≤ 60 characters** (measure with entities decoded, e.g. `&amp;` = 1).
+  Lead with the searched phrase; no brand suffix needed.
+- **Meta description 120-160 characters**, decoded. Longer gets truncated in
+  results. Write it as a promise of what the reader gets, and keep it truthful
+  (no invented figures or claims).
+- **Social/robots tags** (put them after `twitter:card`): `og:site_name`,
+  `og:locale`, `og:image:width`/`height` (1200x630), `og:image:alt`,
+  `article:published_time` and `article:modified_time` (match JSON-LD dates),
+  `twitter:title`, `twitter:description`, `twitter:image`, `twitter:image:alt`,
+  and `<meta name="robots" content="index, follow, max-image-preview:large">`.
+  `twitter:title`/`description` mirror the `og:` values.
+- **Internal links.** Every new guide gets at least three inbound links from
+  existing guides (a "Keep reading" entry and, where a sentence naturally fits,
+  an in-body link) plus its card in `index.html`. Keep "Keep reading" lists
+  relevant, not exhaustive. Use descriptive anchor text, never "click here".
+- **Dates.** Whenever a guide is edited, bump all four together: byline
+  "Last reviewed", `dateModified`, `article:modified_time`, and the sitemap
+  `<lastmod>`. Also update its "Reviewed" date on the `index.html` card.
+
+## 13. Pre-publish checklist
 
 - [ ] Links `guides.css`; no inline `<style>`.
 - [ ] Byline present with truthful Published + Last-reviewed dates.
@@ -282,4 +305,6 @@ it is silently blocked.
   matches the guide's `dateModified` (§5). When you bump a guide's
   `dateModified`/`Last reviewed`, update its `<lastmod>` in the sitemap in the
   same change — the values are hand-maintained and don't sync automatically.
+- [ ] Title ≤ 60 and description 120-160 characters (decoded); social/robots tags present (§12).
+- [ ] At least three inbound internal links; card added to `index.html`.
 - [ ] No invented rates, stats, credentials, research, or capabilities.
