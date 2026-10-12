@@ -15,20 +15,45 @@
   <meta property="og:image" content="https://gettradereadyapp.com/og-image.png">
   <meta property="og:url" content="https://gettradereadyapp.com/">
   <meta property="og:type" content="website">
+  <meta property="og:site_name" content="TradeReady">
   <meta name="twitter:card" content="summary_large_image">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "TradeReady",
-    "operatingSystem": "iOS",
-    "applicationCategory": "BusinessApplication",
-    "description": "Price jobs with confidence, send estimates and invoices in seconds, and get paid faster with payment links. The job management app for independent tradespeople. Works offline.",
-    "url": "https://gettradereadyapp.com/",
-    "installUrl": "https://apps.apple.com/app/id6790681059",
-    "offers": [
-      { "@type": "Offer", "name": "TradeReady Pro — monthly", "price": "19.99", "priceCurrency": "USD" },
-      { "@type": "Offer", "name": "TradeReady Pro — yearly", "price": "199.99", "priceCurrency": "USD" }
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://gettradereadyapp.com/#website",
+        "name": "TradeReady",
+        "alternateName": ["TradeReady app", "TradeReady: Trade Job Manager"],
+        "url": "https://gettradereadyapp.com/",
+        "publisher": { "@id": "https://gettradereadyapp.com/#organization" }
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://gettradereadyapp.com/#organization",
+        "name": "TradeReady",
+        "url": "https://gettradereadyapp.com/",
+        "logo": "https://gettradereadyapp.com/apple-touch-icon.png",
+        "email": "support@gettradereadyapp.com",
+        "sameAs": ["https://apps.apple.com/us/app/tradeready-trade-job-manager/id6790681059"]
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://gettradereadyapp.com/#app",
+        "name": "TradeReady",
+        "alternateName": "TradeReady: Trade Job Manager",
+        "operatingSystem": "iOS",
+        "applicationCategory": "BusinessApplication",
+        "description": "Price jobs with confidence, send estimates and invoices in seconds, and get paid faster with payment links. The job management app for independent tradespeople. Works offline.",
+        "url": "https://gettradereadyapp.com/",
+        "installUrl": "https://apps.apple.com/us/app/tradeready-trade-job-manager/id6790681059",
+        "publisher": { "@id": "https://gettradereadyapp.com/#organization" },
+        "offers": [
+          { "@type": "Offer", "name": "TradeReady Pro — monthly", "price": "19.99", "priceCurrency": "USD" },
+          { "@type": "Offer", "name": "TradeReady Pro — yearly", "price": "199.99", "priceCurrency": "USD" }
+        ]
+      }
     ]
   }
   </script>
