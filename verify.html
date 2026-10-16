@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>Check a signed record — TradeReady</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+           font-size: 16px; line-height: 1.6; color: #1a1a1a; background: #f9f9f9; padding: 2rem 1rem; }
+    .page { max-width: 560px; margin: 0 auto; background: #fff; border-radius: 12px;
+            padding: 2rem; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+    .brand { font-size: 1.4rem; font-weight: 800; color: #2563eb; margin-bottom: 1rem; }
+    h1 { font-size: 1.25rem; margin-bottom: .5rem; }
+    h2 { font-size: 1rem; margin: 1.5rem 0 .5rem; }
+    p { margin-bottom: .75rem; }
+    .muted { color: #6b7280; font-size: .9rem; }
+    label { font-size: .9rem; font-weight: 600; display: block; margin: .75rem 0 .35rem; }
+    input { width: 100%; padding: .7rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem; }
+    input[type="file"] { padding: .5rem; }
+    .mono, input.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .85rem; word-break: break-all; }
+    button { margin-top: 1rem; padding: .85rem 1.25rem; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600;
+             cursor: pointer; background: #2563eb; color: #fff; }
+    button:disabled { opacity: .65; cursor: wait; }
+    .result { margin-top: 1rem; padding: 1rem; border-radius: 8px; font-weight: 600; }
+    .ok { background: #ecfdf5; color: #065f46; }
+    .bad { background: #fef2f2; color: #991b1b; }
+    .info { background: #eff6ff; color: #1e40af; }
+    [hidden] { display: none !important; }
+    .keys li { list-style: none; margin-bottom: .75rem; }
+    .footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #e5e7eb; font-size: .8rem; color: #9ca3af; }
+  </style>
+</head>
+<body>
+<div class="page">
+  <div class="brand">TradeReady</div>
+  <h1>Check a signed record</h1>
+  <p>TradeReady seals each e-signature record with a digital key. Checking a record tells you whether it is still exactly as it was when it was signed.</p>
+  <p class="muted">This checks that the record is intact. It doesn't confirm who signed it: the record shows who had the signing link, when, and from where.</p>
+
+  <form id="lookupForm" novalidate>
+    <h2>Check by record ID</h2>
+    <p class="muted">Both values are printed on the signature certificate of the signed copy.</p>
+    <label for="recordId">Record ID</label>
+    <input id="recordId" class="mono" autocomplete="off" spellcheck="false" placeholder="3f0c1a2b-…">
+    <label for="recordDigest">Record SHA-256 (fingerprint)</label>
+    <input id="recordDigest" class="mono" autocomplete="off" spellcheck="false" placeholder="64 characters, 0-9 and a-f">
+    <button type="submit" id="lookupBtn">Check record</button>
+    <div id="lookupResult" class="result" role="status" aria-live="polite" hidden></div>
+  </form>
+
+  <section aria-labelledby="fileHeading">
+    <h2 id="fileHeading">Check a downloaded record file</h2>
+    <p class="muted">Choose the signature record (JSON) you downloaded from your signing link. Your browser checks it on this device; the file isn't uploaded.</p>
+    <label for="recordFile">Signature record file</label>
+    <input id="recordFile" type="file" accept="application/json,.json">
+    <div id="fileResult" class="result" role="status" aria-live="polite" hidden></div>
+  </section>
+
+  <section aria-labelledby="keysHeading">
+    <h2 id="keysHeading">Public keys</h2>
+    <p class="muted">Seals are Ed25519 signatures over the 32-byte SHA-256 of the record's canonical JSON (keys sorted, no spaces). Anyone can check them with these public keys.</p>
+    <ul class="keys" id="keyList"><li class="muted">Loading…</li></ul>
+  </section>
+
+  <div class="footer">TradeReady isn't a law firm and this page isn't legal advice.</div>
+</div>
+
+<script src="esign.js"></script>
+<script>
+  // Keys published with this page (owner step at stage C: paste each key id
+  // and its base64 raw Ed25519 public key here). While empty, the page uses
+  // the keys the TradeReady server reports and says so.
+  var PUBLISHED_KEYS = {"k2026-10": "aoEIduHhgJiwSd1/NPgPDISa21riZFmG93stQEzc+PM="};
+
+  var API = 'https://tradeready-backend.tradeready.workers.dev/api/esign';
+  var params = new URLSearchParams(location.search);
+  var esc = window.TREsign ? TREsign.esc : function (s) { return String(s); };
+  var serverKeys = {};
+
+  function show(el, cls, html) {
+    el.className = 'result ' + cls;
+    el.innerHTML = html;
+    el.hidden = false;
+  }
+  function keysForChecking() {
+    return Object.keys(PUBLISHED_KEYS).length ? PUBLISHED_KEYS : serverKeys;
+  }
+
+  async function loadKeys() {
+    var list = document.getElementById('keyList');
+    try {
+      var res = await fetch(API + '/public-keys');
+      var out = await res.json();
+      (out.keys || []).forEach(function (k) { serverKeys[k.keyId] = k.publicKey; });
+    } catch (e) { /* offline: published keys only */ }
+    var ids = Object.keys(PUBLISHED_KEYS).length ? Object.keys(PUBLISHED_KEYS) : Object.keys(serverKeys);
+    if (!ids.length) { list.innerHTML = '<li class="muted">No keys have been published yet.</li>'; return; }
+    list.innerHTML = ids.sort().map(function (id) {
+      var published = PUBLISHED_KEYS[id];
+      var served = serverKeys[id];
+      var note = published && served && published !== served ? ' <strong>(the server reports a different key)</strong>' :
+        (!published ? ' (as reported by the TradeReady server)' : '');
+      return '<li><strong class="mono">' + esc(id) + '</strong>' + note + '<br><span class="mono">' + esc(published || served) + '</span></li>';
+    }).join('');
+  }
+
+  async function lookup(ev) {
+    if (ev) ev.preventDefault();
+    var r = document.getElementById('recordId').value.trim().toLowerCase();
+    var d = document.getElementById('recordDigest').value.trim().toLowerCase();
+    var out = document.getElementById('lookupResult');
+    if (!/^[0-9a-f-]{36}$/.test(r) || !/^[0-9a-f]{64}$/.test(d)) {
+      show(out, 'bad', esc('Enter the record ID and the 64-character record SHA-256 exactly as printed on the certificate.'));
+      return;
+    }
+    var btn = document.getElementById('lookupBtn');
+    btn.disabled = true;
+    try {
+      var res = await fetch(API + '/verify?r=' + encodeURIComponent(r) + '&d=' + encodeURIComponent(d));
+      var body = await res.json().catch(function () { return {}; });
+      if (!res.ok) { show(out, 'bad', esc(body.error || 'Could not check this record. Please try again.')); return; }
+      if (body.valid) {
+        var when = new Date(body.signedAt);
+        show(out, 'ok', esc('Valid. This ' + (body.documentType === 'change_order' ? 'change order' : 'estimate') +
+          ' record is unchanged since it was signed on ' + (isNaN(when.getTime()) ? body.signedAt : when.toUTCString()) +
+          '. Sealed with key ' + body.keyId + '.'));
+      } else {
+        show(out, 'bad', esc('Not valid. No sealed record matches this record ID and fingerprint. Check both values, or the record may have changed.'));
+      }
+    } catch (e) {
+      show(out, 'bad', esc('Could not reach TradeReady. Please check your connection and try again.'));
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  function checkFile() {
+    var file = this.files && this.files[0];
+    var out = document.getElementById('fileResult');
+    if (!file) return;
+    if (!window.TREsign || !window.crypto || !crypto.subtle) {
+      show(out, 'bad', esc("This browser can't check files. Use the record ID check above."));
+      return;
+    }
+    var reader = new FileReader();
+    reader.onload = async function () {
+      var envelope;
+      try { envelope = JSON.parse(String(reader.result)); } catch (e) {
+        show(out, 'bad', esc('This file is not a TradeReady signature record.'));
+        return;
+      }
+      try {
+        var r = await TREsign.verifyEnvelope(envelope, keysForChecking());
+        if (!r.digestOk) {
+          show(out, 'bad', esc('Not valid. The record in this file has been changed: its fingerprint no longer matches.'));
+        } else if (r.sealOk === true) {
+          show(out, 'ok', esc('Valid. The record is unchanged and its seal checks out with key ' + r.keyId + '.'));
+        } else if (r.sealOk === null) {
+          show(out, 'info', esc("The record's fingerprint matches (" + r.digest + "), but this browser can't check Ed25519 seals. Use the record ID check above."));
+        } else {
+          show(out, 'bad', esc('Not valid. The seal does not match a published TradeReady key.'));
+        }
+      } catch (e) {
+        show(out, 'bad', esc(e.message || 'This file is not a TradeReady signature record.'));
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  document.getElementById('lookupForm').addEventListener('submit', lookup);
+  document.getElementById('recordFile').addEventListener('change', checkFile);
+  loadKeys();
+  if (params.get('r') && params.get('d')) {
+    document.getElementById('recordId').value = params.get('r');
+    document.getElementById('recordDigest').value = params.get('d');
+    lookup();
+  }
+</script>
+</body>
+</html>
