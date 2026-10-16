@@ -32,15 +32,42 @@
     .info { background: #eff6ff; color: #1e40af; }
     .err { background: #fef2f2; color: #991b1b; }
     .footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #e5e7eb; font-size: .8rem; color: #9ca3af; }
+    .reload { display: block; margin: .75rem auto 0; padding: .6rem 1.5rem; background: #2563eb; color: #fff; }
+    button:disabled { opacity: .65; cursor: wait; }
+    /* E-signatures (Phase 19): agree-and-sign block, description, signed view. */
+    [hidden] { display: none !important; }
+    .doc-section { margin-top: 1rem; }
+    .doc-section h2, .esign h2, .signed h2 { font-size: 1rem; margin-bottom: .35rem; }
+    .pre { white-space: pre-line; }
+    .small { font-size: .85rem; }
+    .esign, .signed { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e5e7eb; display: flex; flex-direction: column; gap: .6rem; }
+    .consent-row { display: flex; gap: .6rem; align-items: flex-start; }
+    .consent-row input { width: 1.15rem; height: 1.15rem; padding: 0; margin-top: .3rem; flex: none; accent-color: #16a34a; }
+    .consent-label { margin: 0; }
+    .linkish { background: none; border: 0; padding: 0; color: #2563eb; text-decoration: underline; font-weight: 500; font-size: .9rem; text-align: left; }
+    .disclosure { font-size: .85rem; background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 8px; padding: .75rem 1rem; }
+    .disclosure ul { margin: .5rem 0 0 1.1rem; }
+    .disclosure li { margin-bottom: .35rem; }
+    .field-label { font-size: .9rem; font-weight: 600; }
+    .sig-pad { width: 100%; height: auto; aspect-ratio: 3 / 1; border: 1px dashed #9ca3af; border-radius: 8px; background: #fff; touch-action: none; }
+    .secondary { background: #fff; color: #374151; border: 1px solid #d1d5db; padding: .5rem; font-size: .9rem; }
+    .intent { font-size: .9rem; background: #f0fdf4; border-left: 3px solid #16a34a; padding: .6rem .75rem; border-radius: 4px; }
+    .esign-error { color: #991b1b; background: #fef2f2; padding: .6rem .75rem; border-radius: 8px; font-size: .9rem; }
+    .sig-name { font-size: 1.3rem; font-weight: 700; }
+    .sig-svg { width: 100%; max-width: 360px; height: auto; color: #111827; border-bottom: 1px solid #d1d5db; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; word-break: break-all; font-size: .8rem; }
+    .download { display: inline-block; background: #2563eb; color: #fff; padding: .7rem 1.1rem; border-radius: 8px; font-weight: 600; text-decoration: none; }
+    .note { font-size: .85rem; color: #6b7280; }
   </style>
 </head>
 <body>
 <div class="page">
   <div class="brand">TradeReady</div>
   <div id="content"><p class="muted">Review and approve this change to your job.</p></div>
-  <div class="footer">By typing your name you approve this change to the original estimate.</div>
+  <div class="footer" id="footerNote">By typing your name you approve this change to the original estimate.</div>
 </div>
 
+<script src="esign.js"></script>
 <script>
   var API = 'https://tradeready-backend.tradeready.workers.dev/api/estimate';
   var params = new URLSearchParams(location.search);
@@ -63,6 +90,27 @@
   function esc(s) { var d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML; }
   function banner(cls, msg) { content.innerHTML = '<div class="banner ' + cls + '">' + esc(msg) + '</div>'; }
 
+  // E-signatures (Phase 19): the Worker's signing texts while this change
+  // order signs through the e-signature path, the mounted block, and the
+  // digest of the snapshot on screen (echoed so a stale page can't sign).
+  var esignTexts = null;
+  var esignCtl = null;
+  var shownDigest = null;
+  var ESIGN_FOOTER = 'When you sign, a signature record is stored with this change order: your typed name, your drawing if you add one, ' +
+    'your email if you ask for a copy, the time, your IP address and your device.';
+  function link() { return { jobId: jobId, token: token, changeOrderId: coId }; }
+  function esignOn() { return !!(esignTexts && window.TREsign); }
+  function setEsignFooter() {
+    var f = document.getElementById('footerNote');
+    if (f) f.textContent = ESIGN_FOOTER;
+  }
+  function reloadBanner(msg) {
+    content.innerHTML = '<div class="banner err" role="alert">' +
+      esc(msg || 'This change order was just updated. Please reload the page to see the latest version.') +
+      '<button type="button" class="reload" id="reloadBtn">Reload</button></div>';
+    document.getElementById('reloadBtn').onclick = function () { location.reload(); };
+  }
+
   if (!jobId || !coId || !token) { banner('err', 'This link is missing information. Please ask for a new link.'); }
   else { load(); }
 
@@ -75,7 +123,11 @@
   }
 
   function render(est) {
+    shownDigest = est.snapshotDigest || null;
+    esignTexts = est.esign && typeof est.esign === 'object' && est.esign.disclosure ? est.esign : null;
+    esignCtl = null;
     if (est.decision === 'approved') {
+      if (est.signed && window.TREsign) { renderSigned(est); return; }
       banner('ok', 'You approved this change' + (est.consentAt ? ' on ' + new Date(est.consentAt).toLocaleDateString() : '') + '. Thank you!');
       return;
     }
@@ -86,11 +138,15 @@
     var lines = (est.lineItems || []).map(function (li) {
       return '<div class="row"><span>' + esc(li.label) + '</span><span>' + money(li.amount) + '</span></div>';
     }).join('');
-    var descriptionHtml = est.description
+    // On the e-signature path the description shown is the snapshot's
+    // `scope` (what gets sealed) whenever the app sent one.
+    var sealedScope = esignOn() && est.scope;
+    var descriptionHtml = !sealedScope && est.description
       ? '<p class="muted" style="margin-top:.5rem">' + esc(est.description) + '</p>' : '';
     content.innerHTML =
       '<h1>' + esc(est.jobTitle) + '</h1>' +
       '<p class="muted">From ' + esc(est.businessName) + ' &middot; For ' + esc(est.customerName) + '</p>' +
+      (sealedScope ? TREsign.scopeHtml(est, 'change_order') : '') +
       '<div style="margin-top:1rem">' + lines +
       descriptionHtml +
       '<div class="row total"><span>Total for this change</span><span>' + money(est.total) + '</span></div></div>' +
@@ -100,12 +156,17 @@
         '<div class="change-line"><span>This change</span><span id="ctx-change"></span></div>' +
         '<div class="new-total"><span>New job total</span><span id="ctx-new"></span></div>' +
         '</div>' : '') +
+      (esignOn() ? TREsign.termsHtml(est) + TREsign.blockHtml(esignTexts, link(), 'change_order') :
       '<div class="actions">' +
       '<label for="signer">Type your full name to approve</label>' +
       '<input id="signer" placeholder="Your full name" autocomplete="name">' +
       '<button class="approve" id="approveBtn">Approve this change</button>' +
       '<button class="decline" id="declineBtn">Decline</button>' +
-      '</div>';
+      '</div>');
+    if (esignOn()) {
+      esignCtl = TREsign.mountBlock(document.getElementById('esignBlock'));
+      setEsignFooter();
+    }
     if (est.context) {
       document.getElementById('ctx-original').textContent = money(est.context.originalTotal);
       var sign = est.context.changeAmount >= 0 ? '+' : '';
@@ -116,7 +177,56 @@
     document.getElementById('declineBtn').onclick = function () { respond('declined'); };
   }
 
+  // Phase 19 signed view: the change as signed, then the signature block.
+  function renderSigned(est) {
+    var lines = (est.lineItems || []).map(function (li) {
+      return '<div class="row"><span>' + esc(li.label) + '</span><span>' + money(li.amount) + '</span></div>';
+    }).join('');
+    content.innerHTML =
+      '<div class="banner ok" role="status">' + esc('You approved and signed this change' +
+        (est.consentAt ? ' on ' + new Date(est.consentAt).toLocaleDateString() : '') + '. Thank you!') + '</div>' +
+      '<h1 style="margin-top:1rem">' + esc(est.jobTitle) + '</h1>' +
+      '<p class="muted">From ' + esc(est.businessName) + ' &middot; For ' + esc(est.customerName) + '</p>' +
+      (est.scope ? TREsign.scopeHtml(est, 'change_order') : (est.description ? '<p class="muted" style="margin-top:.5rem">' + esc(est.description) + '</p>' : '')) +
+      '<div style="margin-top:1rem">' + lines +
+      '<div class="row total"><span>Total for this change</span><span>' + money(est.total) + '</span></div></div>' +
+      TREsign.termsHtml(est) +
+      TREsign.signedHtml(est.signed, link(), 'change_order');
+    setEsignFooter();
+  }
+
+  async function respondEsign(decision) {
+    var got = esignCtl.collect(decision);
+    if (got.error) { esignCtl.showError(got.error, got.focus); return; }
+    var reason = decision === 'declined' ? (prompt('Optional: reason for declining?') || '') : '';
+    var payload = { jobId: jobId, changeOrderId: coId, token: token, decision: decision, declineReason: reason };
+    if (shownDigest) payload.snapshotDigest = shownDigest;
+    if (decision === 'approved') {
+      for (var k in got.fields) if (Object.prototype.hasOwnProperty.call(got.fields, k)) payload[k] = got.fields[k];
+    }
+    esignCtl.setBusy(true, decision === 'approved' ? 'Signing\u2026' : null);
+    try {
+      var res = await fetch(API + '/change-respond', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      var out = await res.json().catch(function () { return {}; });
+      if (res.status === 409 && /reload/i.test(out.error || '')) { reloadBanner(out.error); return; }
+      if (!res.ok) {
+        esignCtl.setBusy(false);
+        esignCtl.showError(out.error || 'Something went wrong. Please try again.');
+        return;
+      }
+      if (decision === 'approved') { await load(); return; }
+      banner('info', 'You declined this change. Thank you for letting us know.');
+    } catch (e) {
+      esignCtl.setBusy(false);
+      esignCtl.showError('Could not submit. Please check your connection and try again.');
+    }
+  }
+
   async function respond(decision) {
+    if (esignCtl) { await respondEsign(decision); return; }
     var signerName = (document.getElementById('signer') || {}).value || '';
     if (decision === 'approved' && !signerName.trim()) { alert('Please type your name to approve.'); return; }
     var reason = decision === 'declined' ? (prompt('Optional: reason for declining?') || '') : '';

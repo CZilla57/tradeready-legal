@@ -220,6 +220,13 @@
     var d = new Date(ymd + 'T00:00:00Z');
     return new Intl.DateTimeFormat(undefined, { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' }).format(d);
   }
+  // "Nov 2" for valid-until dates (Phase 32), through UTC getters like fmtDate.
+  function fmtMonthDay(ymd) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(ymd))) return esc(ymd);
+    var d = new Date(ymd + 'T00:00:00Z');
+    if (isNaN(d.getTime()) || d.toISOString().slice(0, 10) !== ymd) return esc(ymd);
+    return new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', timeZone: 'UTC' }).format(d);
+  }
   function fmtTime(hm) {
     if (!/^\d{2}:\d{2}$/.test(String(hm))) return esc(hm);
     var parts = hm.split(':');
@@ -258,15 +265,24 @@
   }
 
   function estimateCard(e) {
-    var status, action = '';
+    var status, action = '', dateNote = '';
     if (e.decision === 'approved') status = '<span class="chip chip-ok">Approved</span>';
     else if (e.decision === 'declined') status = '<span class="chip chip-err">Declined</span>';
-    else {
+    else if (e.expired) {
+      // Past its valid-until date (Phase 32): the estimate page offers to
+      // request an updated estimate instead of approving.
+      status = '<span class="chip chip-err">Expired</span>';
+      if (e.validUntil) dateNote = ' · Expired ' + fmtMonthDay(e.validUntil);
+      action = '<div class="card-actions"><a class="button" href="' + esc(e.approvalUrl) + '">Request an Update</a></div>';
+    } else {
       status = '<span class="chip chip-warn">Needs review</span>';
+      if (e.validUntil) dateNote = ' · Valid until ' + fmtMonthDay(e.validUntil);
       action = '<div class="card-actions"><a class="button" href="' + esc(e.approvalUrl) + '">Review Estimate</a></div>';
     }
+    // Undecided good/better/best estimates carry their lowest option total.
+    var amount = e.hasOptions && !e.decision ? 'From ' + money(e.total) : money(e.total);
     return '<article class="card"><div class="card-row"><div class="card-copy"><p class="card-kicker">Estimate</p><strong class="card-title">' + esc(e.title || 'Estimate') + '</strong>' +
-           '<p class="card-meta amount-primary">' + money(e.total) + '</p></div>' + status + '</div>' + action + '</article>';
+           '<p class="card-meta"><span class="amount-primary">' + amount + '</span>' + dateNote + '</p></div>' + status + '</div>' + action + '</article>';
   }
 
   function changeCard(c) {
@@ -298,6 +314,24 @@
     }
     return '<article class="card"><div class="card-row"><div class="card-copy"><p class="card-kicker">Invoice</p><strong class="card-title">' + esc(i.number || 'Invoice') + '</strong>' +
            '<p class="card-meta"><span class="amount-primary">' + amount + '</span>' + (i.due && !i.paid ? ' · Due ' + fmtDate(i.due) : '') + '</p></div>' + right + '</div>' + action + '</article>';
+  }
+
+  // Phase 24: one card per maintenance plan that offers automatic payments.
+  // The Worker only sends plans the owner opened for autopay; links go to the
+  // TradeReady pay page (set up, or manage / turn off).
+  function autopayCard(a) {
+    var on = a.status === 'on';
+    var right = on ? '<span class="chip chip-ok">On</span>' : '<span class="chip chip-info">Available</span>';
+    var meta = invoiceMoney(a.amount) + (a.cadence ? ' ' + esc(a.cadence) : '') + (on && a.card ? ' · ' + esc(a.card) : '');
+    var link = on
+      ? (a.manageUrl ? '<a class="button button-secondary" href="' + esc(a.manageUrl) + '">Manage Automatic Payments</a>' : '')
+      : (a.setupUrl ? '<a class="button" href="' + esc(a.setupUrl) + '">Set Up Automatic Payments</a>' : '');
+    var note = on
+      ? 'Each invoice for this plan is charged to your saved card on its due date.'
+      : 'Save a card to pay future invoices for this plan automatically on their due dates. You can turn it off any time.';
+    return '<article class="card"><div class="card-row"><div class="card-copy"><p class="card-kicker">Maintenance plan</p><strong class="card-title">' + esc(a.description || 'Maintenance plan') + '</strong>' +
+           '<p class="card-meta"><span class="amount-primary">' + meta + '</span></p><p class="card-meta">' + note + '</p></div>' + right + '</div>' +
+           (link ? '<div class="card-actions">' + link + '</div>' : '') + '</article>';
   }
 
   function photosSection(photos) {
@@ -405,7 +439,9 @@
     var photos = data.photos || [];
     var estimates = data.estimates || [];
     var invoices = data.invoices || [];
-    var needsReview = estimates.filter(function (e) { return !e.decision; }).length + changes.filter(function (c) { return c.status !== 'approved' && c.status !== 'declined'; }).length;
+    var autopay = data.autopay || [];
+    // An expired estimate can no longer be approved, so it needs no review.
+    var needsReview = estimates.filter(function (e) { return !e.decision && !e.expired; }).length + changes.filter(function (c) { return c.status !== 'approved' && c.status !== 'declined'; }).length;
     var balanceDue = invoices.reduce(function (sum, i) { return sum + (i.paid ? 0 : Math.max(0, Number(i.balanceDue) || 0)); }, 0);
     var nextAppointment = appointments.length ? fmtDate(appointments[0].date) : 'None scheduled';
 
@@ -421,6 +457,7 @@
       section('estimates', 'Estimates', estimates.map(estimateCard), 'No estimates have been shared yet.') +
       (changes.length ? section('changes', 'Project Changes', changes.map(changeCard), '') : '') +
       section('invoices', 'Invoices', invoices.map(invoiceCard), 'No invoices have been shared yet.') +
+      (autopay.length ? section('autopay', 'Automatic Payments', autopay.map(autopayCard), '') : '') +
       (photos.length ? '<section class="section" id="photos"><div class="section-head"><h2>Project Photos</h2><span class="section-count">' + photos.length + (photos.length === 1 ? ' photo' : ' photos') + '</span></div>' + photosSection(photos) + '</section>' : '') +
       '</div><aside class="side-column" aria-label="Contact the business">' + requestSection(appointments) + '</aside></div>';
     content.innerHTML = html;

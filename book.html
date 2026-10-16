@@ -54,6 +54,19 @@
   var API = 'https://tradeready-backend.tradeready.workers.dev/api/booking';
   var params = new URLSearchParams(location.search);
   var token = params.get('b');
+  // Lead source: the owner shares ".../book.html?b=<token>&src=nextdoor" and the
+  // tag rides along on submit AND reserve. The Worker cleans and caps it, so it
+  // can never fail a booking.
+  var src = (params.get('src') || '').trim();
+  // Referral code: a customer's personal link adds &r=<code>. It is opaque and
+  // never displayed; the Worker format-checks it and the owner's app resolves
+  // it. Valid, unknown and malformed codes look identical on this page.
+  var ref = (params.get('r') || '').trim();
+  // Campaign code: a past-customer campaign's link adds &c=<code>. Like r, it
+  // is opaque and never displayed; the Worker format-checks it and the owner's
+  // app resolves it. If a link carries both r and c, both are sent and the
+  // app decides (a referral beats a campaign for a new customer's source).
+  var camp = (params.get('c') || '').trim();
   var content = document.getElementById('content');
 
   var bizName = 'this business';
@@ -137,12 +150,16 @@
     el.style.display = 'block';
   }
   function contactPayload() {
-    return {
+    var payload = {
       b: token,
       name: val('name'), phone: val('phone'), email: val('email'),
       address: val('address'), details: val('details'), preferredTiming: val('timing'),
       website: document.getElementById('website') ? document.getElementById('website').value : '',
     };
+    if (src) payload.leadSource = src;
+    if (ref) payload.referralCode = ref;
+    if (camp) payload.campaignCode = camp;
+    return payload;
   }
   function validateContact(p) {
     if (!p.name) { showErr('Please tell us your name.'); return false; }

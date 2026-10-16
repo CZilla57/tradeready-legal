@@ -28,15 +28,63 @@
     .info { background: #eff6ff; color: #1e40af; }
     .err { background: #fef2f2; color: #991b1b; }
     .footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #e5e7eb; font-size: .8rem; color: #9ca3af; }
+    /* Good/better/best options (only rendered when the estimate has them). */
+    .choices { border: 0; margin-top: 1.25rem; }
+    .choices legend { font-weight: 700; margin-bottom: .5rem; }
+    .choice { display: flex; gap: .75rem; align-items: flex-start; font-size: 1rem; font-weight: 400; margin: 0 0 .75rem;
+              padding: 1rem; border: 1px solid #e5e7eb; border-radius: 10px; cursor: pointer; }
+    .choice.selected { border-color: #2563eb; box-shadow: 0 0 0 1px #2563eb; background: #f8fbff; }
+    .choice:focus-within { outline: 2px solid #2563eb; outline-offset: 2px; }
+    .choice input { width: auto; padding: 0; border: 0; margin-top: .35rem; flex: none; accent-color: #2563eb; }
+    .choice-body { display: block; flex: 1; min-width: 0; }
+    .choice-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: .25rem .5rem; }
+    .choice-price { margin-left: auto; font-weight: 700; }
+    .choice-desc { display: block; margin-top: .15rem; }
+    .choice-lines { display: block; margin-top: .5rem; }
+    .choice-lines .row { font-size: .9rem; padding: .35rem 0; gap: 1rem; }
+    .badge { display: inline-block; font-size: .75rem; font-weight: 700; color: #1e40af; background: #eff6ff;
+             border-radius: 999px; padding: .05rem .55rem; }
+    .reload { display: block; margin: .75rem auto 0; padding: .6rem 1.5rem; background: #2563eb; color: #fff; }
+    /* Valid-until dates (Phase 32): the expired view and its request form. */
+    .warn { background: #fffbeb; color: #92400e; }
+    .primary { background: #2563eb; color: #fff; }
+    button:disabled { opacity: .65; cursor: wait; }
+    .quoted { margin-top: 1rem; font-weight: 700; }
+    .note { font-size: .85rem; color: #6b7280; text-align: center; }
+    .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+    /* E-signatures (Phase 19): agree-and-sign block, scope/terms, signed view. */
+    [hidden] { display: none !important; }
+    .doc-section { margin-top: 1rem; }
+    .doc-section h2, .esign h2, .signed h2 { font-size: 1rem; margin-bottom: .35rem; }
+    .pre { white-space: pre-line; }
+    .small { font-size: .85rem; }
+    .esign, .signed { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e5e7eb; display: flex; flex-direction: column; gap: .6rem; }
+    .consent-row { display: flex; gap: .6rem; align-items: flex-start; }
+    .consent-row input { width: 1.15rem; height: 1.15rem; padding: 0; margin-top: .3rem; flex: none; accent-color: #16a34a; }
+    .consent-label { margin: 0; }
+    .linkish { background: none; border: 0; padding: 0; color: #2563eb; text-decoration: underline; font-weight: 500; font-size: .9rem; text-align: left; }
+    .disclosure { font-size: .85rem; background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 8px; padding: .75rem 1rem; }
+    .disclosure ul { margin: .5rem 0 0 1.1rem; }
+    .disclosure li { margin-bottom: .35rem; }
+    .field-label { font-size: .9rem; font-weight: 600; }
+    .sig-pad { width: 100%; height: auto; aspect-ratio: 3 / 1; border: 1px dashed #9ca3af; border-radius: 8px; background: #fff; touch-action: none; }
+    .secondary { background: #fff; color: #374151; border: 1px solid #d1d5db; padding: .5rem; font-size: .9rem; }
+    .intent { font-size: .9rem; background: #f0fdf4; border-left: 3px solid #16a34a; padding: .6rem .75rem; border-radius: 4px; }
+    .esign-error { color: #991b1b; background: #fef2f2; padding: .6rem .75rem; border-radius: 8px; font-size: .9rem; }
+    .sig-name { font-size: 1.3rem; font-weight: 700; }
+    .sig-svg { width: 100%; max-width: 360px; height: auto; color: #111827; border-bottom: 1px solid #d1d5db; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; word-break: break-all; font-size: .8rem; }
+    .download { display: inline-block; background: #2563eb; color: #fff; padding: .7rem 1.1rem; border-radius: 8px; font-weight: 600; text-decoration: none; }
   </style>
 </head>
 <body>
 <div class="page">
   <div class="brand">TradeReady</div>
   <div id="content"><p class="muted">Loading your estimate…</p></div>
-  <div class="footer">By approving, you consent to an electronic signature record (your typed name, the time, and your device) being stored with this estimate.</div>
+  <div class="footer" id="footerNote">By approving, you consent to an electronic signature record (your typed name, the time, and your device) being stored with this estimate.</div>
 </div>
 
+<script src="esign.js"></script>
 <script>
   var API = 'https://tradeready-backend.tradeready.workers.dev/api/estimate';
   var params = new URLSearchParams(location.search);
@@ -55,6 +103,93 @@
   function esc(s) { var d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML; }
   function banner(cls, msg) { content.innerHTML = '<div class="banner ' + cls + '">' + esc(msg) + '</div>'; }
 
+  // Good/better/best options (Phase 25). Set while an options estimate is on
+  // screen: { options, digest }. Legacy estimates leave it null and post
+  // exactly what they always have.
+  var quote = null;
+  // The digest of the snapshot on screen (Phase 32). Echoed on EVERY
+  // respond, so no estimate — single-total included — can be approved
+  // against a version the customer never saw (an extension changes it).
+  var shownDigest = null;
+  // E-signatures (Phase 19): the Worker's signing texts while this estimate
+  // signs through the e-signature path (view `esign`), and the mounted
+  // "Agree and sign" block. Both null on the legacy typed-name page.
+  var esignTexts = null;
+  var esignCtl = null;
+  var ESIGN_FOOTER = 'When you sign, a signature record is stored with this estimate: your typed name, your drawing if you add one, ' +
+    'your email if you ask for a copy, the time, your IP address and your device.';
+  function link() { return { jobId: jobId, token: token, changeOrderId: null }; }
+  function esignOn() { return !!(esignTexts && window.TREsign); }
+  function scopeHtml(est) { return window.TREsign ? TREsign.scopeHtml(est, 'estimate') : ''; }
+  function termsHtml(est) { return window.TREsign ? TREsign.termsHtml(est) : ''; }
+  // The approve/decline controls: the e-signature block, or the legacy form.
+  function actionsHtml() {
+    if (esignOn()) return TREsign.blockHtml(esignTexts, link(), 'estimate');
+    return '<div class="actions">' +
+      '<label for="signer">Type your full name to approve</label>' +
+      '<input id="signer" placeholder="Your full name" autocomplete="name">' +
+      '<button class="approve" id="approveBtn">Approve estimate</button>' +
+      '<button class="decline" id="declineBtn">Decline</button>' +
+      '</div>';
+  }
+  function wireActions() {
+    esignCtl = esignOn() ? TREsign.mountBlock(document.getElementById('esignBlock')) : null;
+    var f = document.getElementById('footerNote');
+    if (f && esignOn()) f.textContent = ESIGN_FOOTER;
+    document.getElementById('approveBtn').onclick = function () { respond('approved'); };
+    document.getElementById('declineBtn').onclick = function () { respond('declined'); };
+  }
+
+  // Owner-naive YYYY-MM-DD rendered through UTC getters so the viewer's zone
+  // can never shift the day (portal.html fmtDate precedent).
+  function fmtLongDate(ymd) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(ymd))) return '';
+    var d = new Date(ymd + 'T00:00:00Z');
+    // A real date only (2026-02-30 would silently roll to March 2).
+    if (isNaN(d.getTime()) || d.toISOString().slice(0, 10) !== ymd) return '';
+    return new Intl.DateTimeFormat(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' }).format(d);
+  }
+  // The date is enforced in the owner's zone. When the viewer is elsewhere,
+  // name that zone, e.g. "Mountain Standard Time". An unknown zone (the
+  // server then judges it anywhere-on-Earth) gets no suffix.
+  function ownerZoneName(ymd, tz) {
+    if (!tz || typeof tz !== 'string') return '';
+    var viewer = '';
+    try { viewer = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) { /* unknown viewer zone */ }
+    if (viewer === tz) return '';
+    try {
+      var parts = new Intl.DateTimeFormat(undefined, { timeZone: tz, timeZoneName: 'long' }).formatToParts(new Date(ymd + 'T12:00:00Z'));
+      for (var i = 0; i < parts.length; i++) if (parts[i].type === 'timeZoneName') return parts[i].value;
+    } catch (e) { /* unresolvable zone */ }
+    return '';
+  }
+  function validUntilLine(est) {
+    var when = fmtLongDate(est.validUntil);
+    if (!when) return '';
+    var zone = ownerZoneName(est.validUntil, est.validUntilTimeZone);
+    return '<p class="muted" id="validUntil">Valid until ' + esc(when + (zone ? ' (' + zone + ')' : '')) + '</p>';
+  }
+
+  function hasOptions(est) { return !!(est.options && Array.isArray(est.options.tiers) && est.options.tiers.length); }
+  function addOnsOf(options) { return Array.isArray(options.addOns) ? options.addOns : []; }
+  // Same integer-cent arithmetic as the server (backend-workers
+  // lib/estimate/quoteOptions.js resolveSelection), so the total shown is the
+  // total recorded.
+  function cents(n) { return Math.round((Number(n) || 0) * 100); }
+  function selectionTotal(options, tierId, addOnIds) {
+    var tier = options.tiers.filter(function (t) { return t && t.id === tierId; })[0];
+    if (!tier) return null;
+    var sum = cents(tier.total);
+    addOnsOf(options).forEach(function (a) { if (addOnIds.indexOf(a.id) !== -1) sum += cents(a.amount); });
+    return sum / 100;
+  }
+  function approvedMessage(est) {
+    var on = est.consentAt ? ' on ' + new Date(est.consentAt).toLocaleDateString() : '';
+    var sel = est.selection;
+    if (sel && sel.tierName) return 'You approved \u201c' + sel.tierName + '\u201d for ' + money(sel.total) + on + '. Thank you!';
+    return 'You approved this estimate' + on + '. Thank you!';
+  }
+
   if (!jobId || !token) { banner('err', 'This link is missing information. Please ask for a new link.'); }
   else { load(); }
 
@@ -67,10 +202,20 @@
   }
 
   function render(est) {
+    quote = null;
+    shownDigest = est.snapshotDigest || null;
+    esignTexts = est.esign && typeof est.esign === 'object' && est.esign.disclosure ? est.esign : null;
+    esignCtl = null;
     if (est.decision === 'approved') {
-      banner('ok', 'You approved this estimate' + (est.consentAt ? ' on ' + new Date(est.consentAt).toLocaleDateString() : '') + '. Thank you!');
+      // E-signed: the signer keeps seeing (and can download) what they signed.
+      if (est.signed && window.TREsign) { renderSigned(est); return; }
+      banner('ok', approvedMessage(est));
       return;
     }
+    // Past its valid-until date (undecided or declined): the server refuses
+    // an approval (410), so offer an updated estimate instead.
+    if (est.expired === true) { renderExpired(est); return; }
+    if (hasOptions(est)) { renderOptions(est); return; }
     var lines = (est.lineItems || []).map(function (li) {
       return '<div class="row"><span>' + esc(li.label) + '</span><span>' + money(li.amount) + '</span></div>';
     }).join('');
@@ -80,33 +225,257 @@
       declinedNote +
       '<h1>' + esc(est.jobTitle) + '</h1>' +
       '<p class="muted">From ' + esc(est.businessName) + ' &middot; For ' + esc(est.customerName) + '</p>' +
+      validUntilLine(est) +
+      scopeHtml(est) +
       '<div style="margin-top:1rem">' + lines +
       '<div class="row total"><span>Total estimate</span><span>' + money(est.total) + '</span></div></div>' +
-      '<div class="actions">' +
-      '<label for="signer">Type your full name to approve</label>' +
-      '<input id="signer" placeholder="Your full name" autocomplete="name">' +
-      '<button class="approve" id="approveBtn">Approve estimate</button>' +
-      '<button class="decline" id="declineBtn">Decline</button>' +
+      termsHtml(est) +
+      actionsHtml();
+    wireActions();
+  }
+
+  // Tier cards are a native radio group and add-ons native checkboxes, so
+  // keyboard and screen-reader behavior come from the browser. Inputs carry
+  // array indexes, never snapshot ids, so no snapshot string lands in an
+  // attribute; every string goes through esc().
+  function renderOptions(est) {
+    var options = est.options;
+    var addOns = addOnsOf(options);
+    var recommendedIndex = 0;
+    options.tiers.forEach(function (t, i) { if (t && t.id === options.recommendedTierId) recommendedIndex = i; });
+    quote = { options: options, digest: est.snapshotDigest };
+
+    var tiers = options.tiers.map(function (t, i) {
+      var id = 'tier' + i;
+      var lines = (t.lineItems || []).map(function (li) {
+        return '<span class="row"><span>' + esc(li.label) + '</span> <span>' + money(li.amount) + '</span></span>';
+      }).join(' ');
+      return '<label class="choice' + (i === recommendedIndex ? ' selected' : '') + '" for="' + id + '">' +
+        '<input type="radio" name="tier" id="' + id + '" value="' + i + '"' + (i === recommendedIndex ? ' checked' : '') +
+        ' aria-labelledby="' + id + '-name" aria-describedby="' + id + '-desc">' +
+        '<span class="choice-body">' +
+        '<span class="choice-head" id="' + id + '-name"><strong>' + esc(t.name) + '</strong> ' +
+        (t.id === options.recommendedTierId ? '<span class="badge">Recommended</span> ' : '') +
+        '<span class="choice-price">' + money(t.total) + '</span></span>' +
+        '<span id="' + id + '-desc">' +
+        (t.description ? '<span class="muted choice-desc">' + esc(t.description) + '</span> ' : '') +
+        '<span class="choice-lines">' + lines + '</span></span>' +
+        '</span></label>';
+    }).join('');
+
+    var extras = addOns.map(function (a, i) {
+      var id = 'addon' + i;
+      return '<label class="choice" for="' + id + '">' +
+        '<input type="checkbox" id="' + id + '" data-addon="' + i + '" aria-labelledby="' + id + '-name"' +
+        (a.description ? ' aria-describedby="' + id + '-desc"' : '') + '>' +
+        '<span class="choice-body">' +
+        '<span class="choice-head" id="' + id + '-name"><strong>' + esc(a.label) + '</strong> ' +
+        '<span class="choice-price">+' + money(a.amount) + '</span></span>' +
+        (a.description ? '<span class="muted choice-desc" id="' + id + '-desc">' + esc(a.description) + '</span>' : '') +
+        '</span></label>';
+    }).join('');
+
+    var declinedNote = est.decision === 'declined'
+      ? '<div class="banner info" style="margin-bottom:1rem">You previously declined this. You can still approve it below.</div>' : '';
+    content.innerHTML =
+      declinedNote +
+      '<h1>' + esc(est.jobTitle) + '</h1>' +
+      '<p class="muted">From ' + esc(est.businessName) + ' &middot; For ' + esc(est.customerName) + '</p>' +
+      validUntilLine(est) +
+      scopeHtml(est) +
+      '<fieldset class="choices"><legend>Choose an option</legend>' + tiers + '</fieldset>' +
+      (extras ? '<fieldset class="choices"><legend>Optional add-ons</legend>' + extras + '</fieldset>' : '') +
+      '<div class="row total"><span>Your total</span><span id="yourTotal" aria-live="polite"></span></div>' +
+      termsHtml(est) +
+      actionsHtml();
+    content.querySelectorAll('.choice input').forEach(function (el) { el.addEventListener('change', updateOptions); });
+    updateOptions();
+    wireActions();
+  }
+
+  // Phase 19 signed view: the document as signed (the chosen option when
+  // there is one), then the signature block with the copy download.
+  function renderSigned(est) {
+    var sel = est.selection && Array.isArray(est.selection.lineItems) ? est.selection : null;
+    var items = sel ? sel.lineItems : (est.lineItems || []);
+    var lines = items.map(function (li) {
+      return '<div class="row"><span>' + esc(li.label) + '</span><span>' + money(li.amount) + '</span></div>';
+    }).join('');
+    content.innerHTML =
+      '<div class="banner ok" role="status">' + esc(approvedMessage(est)) + '</div>' +
+      '<h1 style="margin-top:1rem">' + esc(est.jobTitle) + '</h1>' +
+      '<p class="muted">From ' + esc(est.businessName) + ' &middot; For ' + esc(est.customerName) + '</p>' +
+      scopeHtml(est) +
+      (sel ? '<p class="quoted">Chosen option: ' + esc(sel.tierName) + '</p>' : '') +
+      '<div style="margin-top:1rem">' + lines +
+      '<div class="row total"><span>' + (sel ? 'Your total' : 'Total estimate') + '</span><span>' + money(sel ? sel.total : est.total) + '</span></div></div>' +
+      termsHtml(est) +
+      TREsign.signedHtml(est.signed, link(), 'estimate');
+    var f = document.getElementById('footerNote');
+    if (f) f.textContent = ESIGN_FOOTER;
+  }
+
+  // Phase 32: the expired view. Shows what was quoted, lets the customer ask
+  // for an updated estimate (POST /request-update) or say no.
+  function lowestTierTotal(options) {
+    var totals = options.tiers.map(function (t) { return Number(t && t.total); }).filter(function (n) { return isFinite(n); });
+    return totals.length ? Math.min.apply(null, totals) : 0;
+  }
+  function renderExpired(est) {
+    var biz = est.businessName || 'the business';
+    var when = fmtLongDate(est.validUntil);
+    var quoted = hasOptions(est) ? 'Quoted from ' + money(lowestTierTotal(est.options)) : 'Quoted total: ' + money(est.total);
+    content.innerHTML =
+      '<div class="banner warn" id="expiredBanner" role="status">' +
+      esc(when ? 'This estimate expired on ' + when + '.' : 'This estimate has expired.') + '</div>' +
+      '<h1 style="margin-top:1rem">' + esc(est.jobTitle) + '</h1>' +
+      '<p class="muted">From ' + esc(est.businessName) + ' &middot; For ' + esc(est.customerName) + '</p>' +
+      '<p class="quoted" id="quoted">' + esc(quoted) + '</p>' +
+      '<p id="expiredCopy" style="margin-top:.75rem">' +
+      esc('Prices may have changed since ' + biz + ' sent it. Ask for an updated estimate and they\'ll get back to you.') + '</p>' +
+      '<div class="actions" id="expiredActions">' +
+      '<label for="updateNote">Anything to add? (optional)</label>' +
+      '<textarea id="updateNote" rows="3" maxlength="300"></textarea>' +
+      '<input class="hp" id="website" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">' +
+      '<button type="button" class="primary" id="requestBtn">Request an updated estimate</button>' +
+      '<button type="button" class="decline" id="declineBtn">No longer interested</button>' +
+      '<p class="note">' + esc('Your request goes directly to ' + biz + '.') + '</p>' +
       '</div>';
-    document.getElementById('approveBtn').onclick = function () { respond('approved'); };
+    document.getElementById('requestBtn').onclick = function () { requestUpdate(est); };
     document.getElementById('declineBtn').onclick = function () { respond('declined'); };
   }
 
+  async function requestUpdate(est) {
+    var btn = document.getElementById('requestBtn');
+    var payload = {
+      jobId: jobId,
+      token: token,
+      note: (document.getElementById('updateNote').value || '').trim().slice(0, 300),
+      website: document.getElementById('website').value || '',
+    };
+    btn.disabled = true;
+    btn.textContent = 'Sending\u2026';
+    try {
+      var res = await fetch(API + '/request-update', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      var out = await res.json().catch(function () { return {}; });
+      if (res.ok) {
+        var sent = document.getElementById('expiredBanner');
+        sent.className = 'banner ok';
+        sent.textContent = 'Request sent. ' + (est.businessName || 'The business') + ' will get back to you with an updated estimate.';
+        ['expiredCopy', 'expiredActions'].forEach(function (id) {
+          var el = document.getElementById(id);
+          if (el) el.parentNode.removeChild(el);
+        });
+        return;
+      }
+      // Extended meanwhile: reload into the valid estimate.
+      if (res.status === 409 && out.code === 'estimate_not_expired') { reloadBanner(out.error); return; }
+      banner('err', out.error || 'Something went wrong. Please try again.');
+    } catch (e) { banner('err', 'Could not send. Please check your connection and try again.'); }
+  }
+
+  // The current {tierId, addOnIds}; add-ons in snapshot order.
+  function currentSelection() {
+    var checked = content.querySelector('input[name="tier"]:checked');
+    var tier = checked ? quote.options.tiers[Number(checked.value)] : null;
+    var addOns = addOnsOf(quote.options);
+    var addOnIds = [];
+    content.querySelectorAll('input[data-addon]').forEach(function (el) {
+      if (el.checked) addOnIds.push(addOns[Number(el.getAttribute('data-addon'))].id);
+    });
+    return { tierId: tier ? tier.id : null, addOnIds: addOnIds };
+  }
+
+  function updateOptions() {
+    content.querySelectorAll('.choice').forEach(function (card) {
+      var input = card.querySelector('input');
+      card.classList.toggle('selected', !!(input && input.checked));
+    });
+    var sel = currentSelection();
+    var total = selectionTotal(quote.options, sel.tierId, sel.addOnIds);
+    document.getElementById('yourTotal').textContent = total === null ? '—' : money(total);
+  }
+
+  function reloadBanner(msg) {
+    content.innerHTML = '<div class="banner err" role="alert">' +
+      esc(msg || 'This estimate was just updated. Please reload the page to see the latest version.') +
+      '<button type="button" class="reload" id="reloadBtn">Reload</button></div>';
+    document.getElementById('reloadBtn').onclick = function () { location.reload(); };
+  }
+
+  // Phase 19: approve-and-sign / decline through the e-signature block. The
+  // form stays on screen on a validation error so nothing typed is lost.
+  async function respondEsign(decision) {
+    var got = esignCtl.collect(decision);
+    if (got.error) { esignCtl.showError(got.error, got.focus); return; }
+    var reason = decision === 'declined' ? (prompt('Optional: reason for declining?') || '') : '';
+    var payload = { jobId: jobId, token: token, decision: decision, declineReason: reason };
+    if (shownDigest) payload.snapshotDigest = shownDigest;
+    if (decision === 'approved') {
+      for (var k in got.fields) if (Object.prototype.hasOwnProperty.call(got.fields, k)) payload[k] = got.fields[k];
+      if (quote) payload.selection = currentSelection();
+    }
+    esignCtl.setBusy(true, decision === 'approved' ? 'Signing\u2026' : null);
+    try {
+      var res = await fetch(API + '/respond', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      var out = await res.json().catch(function () { return {}; });
+      if (res.status === 409) { reloadBanner(out.error); return; }
+      if (res.status === 410) { load(); return; }
+      if (!res.ok) {
+        esignCtl.setBusy(false);
+        esignCtl.showError(out.error || 'Something went wrong. Please try again.');
+        return;
+      }
+      if (decision === 'approved') { await load(); return; }
+      banner('info', 'You declined this estimate. Thank you for letting us know.');
+    } catch (e) {
+      esignCtl.setBusy(false);
+      esignCtl.showError('Could not submit. Please check your connection and try again.');
+    }
+  }
+
   async function respond(decision) {
+    if (esignCtl) { await respondEsign(decision); return; }
     var signerName = (document.getElementById('signer') || {}).value || '';
     if (decision === 'approved' && !signerName.trim()) { alert('Please type your name to approve.'); return; }
     var reason = decision === 'declined' ? (prompt('Optional: reason for declining?') || '') : '';
+    var payload = { jobId: jobId, token: token, decision: decision, signerName: signerName, declineReason: reason };
+    if (shownDigest) payload.snapshotDigest = shownDigest;
+    var chosen = null;
+    if (quote && decision === 'approved') { chosen = currentSelection(); payload.selection = chosen; }
     banner('info', 'Submitting…');
     try {
       var res = await fetch(API + '/respond', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jobId: jobId, token: token, decision: decision, signerName: signerName, declineReason: reason }),
+        body: JSON.stringify(payload),
       });
-      var out = await res.json();
+      var out = await res.json().catch(function () { return {}; });
+      // Changed since this page loaded (any estimate): reload to see it.
+      if (res.status === 409) { reloadBanner(out.error); return; }
+      // Past its valid-until date: reload into the expired view.
+      if (res.status === 410) { load(); return; }
       if (!res.ok) { banner('err', out.error || 'Something went wrong. Please try again.'); return; }
       banner(decision === 'approved' ? 'ok' : 'info',
-        decision === 'approved' ? 'Approved — thank you! Your tradesperson has been notified.' : 'You declined this estimate. Thank you for letting us know.');
+        decision === 'approved' ? approvedThanks(out, chosen) : 'You declined this estimate. Thank you for letting us know.');
     } catch (e) { banner('err', 'Could not submit. Please check your connection and try again.'); }
+  }
+
+  function approvedThanks(out, chosen) {
+    var sel = out.selection;
+    if (!sel && chosen && quote) {
+      var tier = quote.options.tiers.filter(function (t) { return t && t.id === chosen.tierId; })[0];
+      sel = tier ? { tierName: tier.name, total: selectionTotal(quote.options, chosen.tierId, chosen.addOnIds) } : null;
+    }
+    if (sel && sel.tierName) {
+      return 'Approved \u201c' + sel.tierName + '\u201d for ' + money(sel.total) + ' — thank you! Your tradesperson has been notified.';
+    }
+    return 'Approved — thank you! Your tradesperson has been notified.';
   }
 </script>
 </body>

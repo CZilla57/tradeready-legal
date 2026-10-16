@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <meta name="referrer" content="no-referrer">
+  <meta name="theme-color" content="#0c335e">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <title>Secure payment — TradeReady</title>
+  <style>
+    @font-face { font-family: 'Chakra Petch'; src: url('/fonts/ChakraPetch-Bold.ttf') format('truetype'); font-weight: 700; font-display: swap; }
+    @font-face { font-family: 'Public Sans'; src: url('/fonts/PublicSans-Regular.ttf') format('truetype'); font-weight: 400; font-display: swap; }
+    @font-face { font-family: 'Public Sans'; src: url('/fonts/PublicSans-SemiBold.ttf') format('truetype'); font-weight: 600; font-display: swap; }
+    @font-face { font-family: 'Public Sans'; src: url('/fonts/PublicSans-Bold.ttf') format('truetype'); font-weight: 700; font-display: swap; }
+    @font-face { font-family: 'IBM Plex Mono'; src: url('/fonts/IBMPlexMono-Medium.ttf') format('truetype'); font-weight: 500; font-display: swap; }
+
+    :root {
+      --navy: #0c335e;
+      --accent: #1d5c9e;
+      --accent-strong: #174b80;
+      --accent-soft: #e8f1f8;
+      --bg: #f4f3ee;
+      --surface: #ffffff;
+      --surface-soft: #f8f9fa;
+      --ink: #14213d;
+      --muted: #626b79;
+      --line: #d9dee5;
+      --success: #176b4d;
+      --success-soft: #e8f5ef;
+      --warning: #8a5308;
+      --warning-soft: #fff4d8;
+      --danger: #9f2f32;
+      --danger-soft: #fae9e9;
+      --display: 'Chakra Petch', 'Segoe UI', sans-serif;
+      --body: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; min-width: 320px; font-family: var(--body); font-size: 16px; line-height: 1.55; color: var(--ink); background: var(--bg); }
+    button { font: inherit; }
+    button, a { touch-action: manipulation; }
+    a { color: var(--accent); }
+    :focus-visible { outline: 3px solid #ed9f4e; outline-offset: 3px; border-radius: 5px; }
+    .skip-link { position: fixed; top: -100px; left: 1rem; z-index: 20; padding: .75rem 1rem; border-radius: 8px; background: var(--surface); color: var(--navy); font-weight: 700; }
+    .skip-link:focus { top: 1rem; }
+
+    .site-head { color: #f4f7fb; background-color: var(--navy); background-image: linear-gradient(rgba(255,255,255,.055) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.055) 1px, transparent 1px); background-size: 24px 24px; }
+    .head-inner { width: min(720px, calc(100% - 2rem)); margin: 0 auto; }
+    .topbar { min-height: 68px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; border-bottom: 1px solid rgba(255,255,255,.14); }
+    .brand { font-family: var(--display); font-size: 1.35rem; font-weight: 700; letter-spacing: .02em; }
+    .brand span { color: #f0a04b; }
+    .secure-label { display: inline-flex; align-items: center; gap: .45rem; font-family: var(--mono); font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: #c9d6e6; }
+    .secure-label::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #70cf9f; box-shadow: 0 0 0 4px rgba(112,207,159,.12); }
+    .hero { padding: 2.25rem 0 2.75rem; }
+    .eyebrow { margin: 0 0 .6rem; font-family: var(--mono); font-size: .76rem; letter-spacing: .15em; text-transform: uppercase; color: #aebfd3; }
+    .hero h1 { margin: 0; font-family: var(--display); font-size: clamp(1.9rem, 6vw, 2.8rem); line-height: 1.1; text-wrap: balance; overflow-wrap: anywhere; }
+
+    .page { width: min(720px, calc(100% - 2rem)); margin: -1rem auto 0; padding-bottom: 3rem; position: relative; }
+    .panel { padding: 1.35rem 1.25rem; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); box-shadow: 0 12px 34px rgba(20,33,61,.09); }
+    .panel + .panel { margin-top: 1rem; }
+    .panel h2 { margin: 0 0 .35rem; font-family: var(--display); font-size: 1.3rem; line-height: 1.2; outline: none; }
+    .lead { margin: 0; color: var(--muted); }
+    .facts { display: grid; grid-template-columns: auto 1fr; gap: .45rem 1rem; margin: 1rem 0 0; padding: .9rem 1rem; border-radius: 10px; background: var(--surface-soft); }
+    .facts dt { color: var(--muted); font-size: .9rem; white-space: nowrap; }
+    .facts dd { margin: 0; text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+    .facts .total dt, .facts .total dd { padding-top: .45rem; border-top: 1px solid var(--line); color: var(--ink); font-size: 1.05rem; font-weight: 700; }
+    .note { margin: 1rem 0 0; padding: .75rem .9rem; border-radius: 10px; font-size: .92rem; }
+    .note-ok { background: var(--success-soft); color: var(--success); }
+    .note-info { background: var(--accent-soft); color: var(--accent-strong); }
+    .note-warn { background: var(--warning-soft); color: var(--warning); }
+    .note-err { background: var(--danger-soft); color: var(--danger); }
+
+    .consent { margin: 1.1rem 0 0; padding: 1rem; border: 1px solid #c6d5e4; border-radius: 12px; background: #fbfcfe; }
+    .consent-row { display: flex; gap: .75rem; align-items: flex-start; }
+    .consent input[type="checkbox"] { flex: 0 0 auto; width: 22px; height: 22px; margin: .1rem 0 0; accent-color: var(--accent); cursor: pointer; }
+    .consent label { cursor: pointer; }
+    .consent-title { display: block; font-weight: 700; line-height: 1.35; }
+    .consent-body { display: block; margin: .5rem 0 0; color: #3a4558; font-size: .88rem; line-height: 1.5; }
+
+    .tip { margin: 1.1rem 0 0; padding: 1rem; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-soft); }
+    .tip fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+    .tip legend { padding: 0; font-weight: 700; line-height: 1.35; overflow-wrap: anywhere; }
+    .tip-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(5.2rem, 1fr)); gap: .5rem; margin-top: .75rem; }
+    .tip-option { position: relative; }
+    .tip-option input { position: absolute; top: 0; left: 0; width: 1px; height: 1px; margin: 0; opacity: 0; }
+    .tip-option label { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 52px; padding: .4rem .5rem; border: 1px solid #c6d5e4; border-radius: 9px; background: var(--surface); color: var(--ink); font-weight: 700; line-height: 1.2; text-align: center; cursor: pointer; }
+    .tip-option label small { margin-top: .15rem; color: var(--muted); font-size: .8rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .tip-option input:checked + label { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-strong); box-shadow: inset 0 0 0 1px var(--accent); }
+    .tip-option input:checked + label small { color: var(--accent-strong); }
+    .tip-option input:focus-visible + label { outline: 3px solid #ed9f4e; outline-offset: 2px; }
+    .tip-custom { margin-top: .8rem; }
+    .tip-custom label { display: block; font-size: .9rem; font-weight: 600; }
+    .tip-custom-row { display: flex; align-items: center; gap: .4rem; margin-top: .35rem; font-weight: 700; }
+    .tip-custom input { width: 100%; max-width: 11rem; min-height: 44px; padding: .5rem .7rem; border: 1px solid #c6d5e4; border-radius: 8px; background: var(--surface); color: var(--ink); font: inherit; font-variant-numeric: tabular-nums; }
+    .tip-custom input[aria-invalid="true"] { border-color: var(--danger); }
+    .tip-error { min-height: 1.3rem; margin: .35rem 0 0; color: var(--danger); font-size: .88rem; font-weight: 600; }
+    .tip-total { margin: .85rem 0 0; padding-top: .7rem; border-top: 1px solid var(--line); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+    .tip-note { margin: .55rem 0 0; color: var(--muted); font-size: .88rem; }
+
+    .actions { display: flex; flex-direction: column; gap: .6rem; margin-top: 1.2rem; }
+    .button { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: .7rem 1rem; border: 1px solid var(--accent); border-radius: 9px; color: #fff; background: var(--accent); font-size: 1rem; font-weight: 700; line-height: 1.25; text-align: center; text-decoration: none; cursor: pointer; transition: background-color .16s ease, border-color .16s ease; }
+    .button:hover { border-color: var(--accent-strong); background: var(--accent-strong); }
+    .button:disabled { cursor: not-allowed; opacity: .55; }
+    .button[aria-busy="true"] { cursor: wait; }
+    .button-secondary { color: var(--accent-strong); background: var(--surface); }
+    .button-secondary:hover { color: var(--navy); background: var(--accent-soft); }
+    .button-danger { border-color: var(--danger); background: var(--danger); }
+    .button-danger:hover { border-color: #7f2427; background: #7f2427; }
+    .status { min-height: 1.4rem; margin: .7rem 0 0; font-size: .9rem; font-weight: 600; }
+    .status.bad { color: var(--danger); }
+    .fine { margin: .9rem 0 0; color: var(--muted); font-size: .8rem; }
+
+    .loading { min-height: 220px; display: grid; place-items: center; text-align: center; color: var(--muted); }
+    .loading-mark { width: 34px; height: 34px; margin: 0 auto .85rem; border: 3px solid #d7e1ea; border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .footer { width: min(720px, calc(100% - 2rem)); margin: 0 auto; padding: 1.4rem 0 2.25rem; border-top: 1px solid var(--line); color: var(--muted); font-size: .78rem; text-align: center; }
+
+    @media (max-width: 460px) {
+      .head-inner, .page, .footer { width: min(100% - 1.25rem, 720px); }
+      .topbar { min-height: 60px; }
+      .hero h1 { font-size: 1.8rem; }
+      .panel { padding: 1.1rem 1rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .loading-mark { animation: none; }
+      .button { transition: none; }
+    }
+  </style>
+</head>
+<body>
+<a class="skip-link" href="#content">Skip to payment details</a>
+<header class="site-head">
+  <div class="head-inner">
+    <div class="topbar">
+      <div class="brand" translate="no">TradeReady<span>.</span></div>
+      <div class="secure-label">Secure payment</div>
+    </div>
+    <div class="hero">
+      <p class="eyebrow" id="eyebrow">Payment</p>
+      <h1 id="businessName">Pay your invoice</h1>
+    </div>
+  </div>
+</header>
+<main class="page" id="content" aria-busy="true">
+  <div class="panel loading" role="status"><div><div class="loading-mark" aria-hidden="true"></div><p>Loading…</p></div></div>
+</main>
+<footer class="footer">Powered by <span translate="no">TradeReady</span>. Card entry is handled by Stripe.</footer>
+
+<script>
+  // TradeReady pay page (Roadmap Phase 24, card-on-file spec §2, §5).
+  // Four modes: ?t= (pay an invoice), ?t=&session_id= (after Checkout),
+  // ?s= (set up automatic payments), ?m= (manage automatic payments).
+  // Everything shown comes from the Worker; card entry happens on
+  // Stripe-hosted Checkout via a top-level navigation (no Stripe.js, no
+  // frames, no CSP change). Always refers to the bare `location`.
+  // Phase 28 (tips spec §3): when the Worker's view carries `tips`, mode t
+  // shows an optional tip step above the Pay button. The page only sends the
+  // chosen tip in cents; the Worker re-checks the owner's setting, caps the
+  // tip and adds it to Checkout as a separate "Tip" line.
+  var API ='https://tradeready-backend.tradeready.workers.dev/api/pay';
+  var params = new URLSearchParams(location.search);
+  var mode = params.get('t') ? 't' : params.get('s') ? 's' : params.get('m') ? 'm' : null;
+  var token = mode ? params.get(mode) : null;
+  var sessionId = params.get('session_id');
+  var setupDone = params.get('done') === '1';
+  var content = document.getElementById('content');
+  var heading = document.getElementById('businessName');
+  var eyebrow = document.getElementById('eyebrow');
+  var business = '';
+  var pendingPolls = 0;
+
+  function esc(s) { var d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML; }
+  // Invoice amounts always show cents, like the app's formatMoney.
+  function money(n) {
+    var cents = Math.round((Number(n) || 0) * 100) / 100;
+    return cents.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  // Owner-naive YYYY-MM-DD through UTC getters (portal.html precedent).
+  function fmtDate(ymd) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(ymd))) return esc(ymd);
+    var d = new Date(ymd + 'T00:00:00Z');
+    if (isNaN(d.getTime())) return esc(ymd);
+    return new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' }).format(d);
+  }
+  function contactLine() { return business ? 'Contact ' + business + '.' : 'Contact the business that sent you this link.'; }
+
+  function show(html) {
+    content.innerHTML = html;
+    content.setAttribute('aria-busy', 'false');
+    var h = content.querySelector('h2');
+    if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
+  }
+  function loading(msg) {
+    content.setAttribute('aria-busy', 'true');
+    content.innerHTML = '<div class="panel loading" role="status"><div><div class="loading-mark" aria-hidden="true"></div><p>' + esc(msg || 'Loading…') + '</p></div></div>';
+  }
+  function setBusiness(name) {
+    business = name || business;
+    if (business) heading.textContent = business;
+  }
+
+  // Complete error copy for every status the Worker returns (400/404/409/
+  // 410/429/500) plus network failures. No dead ends: every state says
+  // what to do next.
+  function errorCopy(code, status) {
+    switch (code) {
+      case 'bad_request': return ['This link is incomplete', 'Ask ' + (business || 'the business') + ' to send you a new link.', false];
+      case 'invalid': return ['This link is no longer valid', contactLine(), false];
+      case 'gone': return ['This link is no longer valid', contactLine(), false];
+      case 'not_ready': return ['This invoice isn’t ready yet', 'Please try again in a few minutes.', true];
+      case 'unavailable': return ['Online payment isn’t available', contactLine(), false];
+      case 'expired': return ['This setup link has expired', 'Open your customer portal again for a fresh link, or ' + contactLine().charAt(0).toLowerCase() + contactLine().slice(1), false];
+      case 'paid': return ['This invoice is already paid', 'Reload to see the latest details.', true];
+      case 'in_flight': return ['An automatic payment is in progress', 'An automatic payment for this invoice is being processed. Please check back in a few minutes.', true];
+      case 'changed': return ['This page is out of date', 'Reload to see the latest details before you continue.', true];
+      case 'maybe_paid': return ['This invoice may have just been paid', 'Reload to check before paying again.', true];
+      case 'busy': return ['Please try again in a moment', 'We’re still working on your last click.', true];
+      case 'rate_limited': return ['Too many attempts', 'Please wait a minute, then try again.', true];
+      case 'tips_off': return ['Tips are no longer offered', 'Please reload to see the latest details before you pay.', true];
+      case 'tip_invalid': return ['Please check the tip amount', 'The tip can’t be more than the invoice.', false];
+    }
+    if (status === 400) return errorCopy('bad_request');
+    if (status === 404) return errorCopy('invalid');
+    if (status === 410) return errorCopy('gone');
+    if (status === 429) return errorCopy('rate_limited');
+    return ['Something went wrong', 'Check your connection, then try again.', true];
+  }
+  function errorPanel(code, status) {
+    var c = errorCopy(code, status);
+    show('<section class="panel"><h2>' + esc(c[0]) + '</h2><p class="lead">' + esc(c[1]) + '</p>' +
+      (c[2] ? '<div class="actions"><button class="button button-secondary" id="retry" type="button">' + (['changed', 'maybe_paid', 'paid', 'in_flight', 'tips_off'].indexOf(code) !== -1 ? 'Reload' : 'Try Again') + '</button></div>' : '') +
+      '</section>');
+    if (c[2]) document.getElementById('retry').addEventListener('click', function () { load(); });
+  }
+
+  async function api(path, init) {
+    var res = await fetch(API + path, init);
+    var body = await res.json().catch(function () { return {}; });
+    return { ok: res.ok, status: res.status, body: body || {} };
+  }
+
+  async function load() {
+    loading();
+    var q = mode + '=' + encodeURIComponent(token) + (mode === 't' && sessionId ? '&session_id=' + encodeURIComponent(sessionId) : '');
+    try {
+      var r = await api('/view?' + q);
+      if (r.body && r.body.businessName) setBusiness(r.body.businessName);
+      if (!r.ok) { errorPanel(r.body.code, r.status); return; }
+      if (r.body.kind === 'invoice') renderInvoice(r.body);
+      else if (r.body.kind === 'setup') renderSetup(r.body);
+      else if (r.body.kind === 'manage') renderManage(r.body);
+      else errorPanel(null, 500);
+    } catch (e) { errorPanel(null, 0); }
+  }
+
+  // ── Mode t: pay an invoice ───────────────────────────────────────────────
+  // "an $18.00 tip" / "a $12.00 tip": the article follows how the amount is
+  // read aloud (eight…, eleven, eighteen and eighty… take "an").
+  function tipArticle(dollars) {
+    var cents = Math.round((Number(dollars) || 0) * 100);
+    var whole = Math.floor(cents / 100);
+    var digits = String(whole > 0 ? whole : cents % 100);
+    var head = digits.slice(0, digits.length % 3 || 3);
+    return head.charAt(0) === '8' || head === '11' || head === '18' ? 'an' : 'a';
+  }
+
+  function receiptPanel(rc, v) {
+    var card = rc.cardBrand && rc.last4 ? '<dt>Card</dt><dd>' + esc(rc.cardBrand) + ' ending ' + esc(rc.last4) + '</dd>' : '';
+    var processing = rc.status !== 'paid';
+    var tip = Number(rc.tip) > 0 ? Number(rc.tip) : 0;
+    var lead = processing ? 'You’ll get a receipt by email once it completes.' : 'A receipt is on its way to your email.';
+    if (tip && !processing) {
+      lead = 'You paid ' + money(rc.amountPaid) + ': ' + money(rc.invoiceAmount) + ' for ' +
+        (v.invoiceNumber ? 'invoice ' + esc(v.invoiceNumber) : 'your invoice') + ' and ' + tipArticle(tip) + ' ' + money(tip) + ' tip. ' + lead;
+    }
+    var amounts = tip
+      ? '<dt>Invoice payment</dt><dd>' + money(rc.invoiceAmount) + '</dd><dt>Tip</dt><dd>' + money(tip) + '</dd>' +
+        '<dt class="total">Total paid</dt><dd class="total">' + money(rc.amountPaid) + '</dd>'
+      : '<dt class="total">Amount paid</dt><dd class="total">' + money(rc.amountPaid) + '</dd>';
+    return '<section class="panel"><h2>' + (processing ? 'Your payment is processing' : 'Payment received. Thank you!') + '</h2>' +
+      '<p class="lead">' + lead + '</p>' +
+      '<dl class="facts"><dt>Invoice</dt><dd>' + esc(v.invoiceNumber || '—') + '</dd>' + card + amounts + '</dl>' +
+      (rc.autopay ? '<p class="note note-info">Automatic payments are being turned on for this plan. You’ll get a confirmation email with a link to manage them.</p>' : '') +
+      (!v.paid && v.amountDue > 0 && !processing ? '<p class="fine">Remaining balance on this invoice: ' + money(v.amountDue) + '.</p>' : '') +
+      '</section>';
+  }
+
+  function renderInvoice(v) {
+    eyebrow.textContent = 'Invoice ' + (v.invoiceNumber || '');
+    if (v.receipt) { show(receiptPanel(v.receipt, v)); return; }
+    var active = v.autopay && v.autopay.active;
+    if (v.paid) {
+      show('<section class="panel"><h2>' + (v.paidAt ? 'Paid on ' + fmtDate(v.paidAt) + '. Thank you.' : 'Paid. Thank you.') + '</h2>' +
+        '<p class="lead">Invoice ' + esc(v.invoiceNumber) + ' has no balance due.</p>' +
+        (active ? '<p class="note note-ok">Automatic payments are on with ' + esc(active.card) + '.</p>' : '') + '</section>');
+      return;
+    }
+    var pay = v.depositRequested != null ? v.depositRequested : v.amountDue;
+    var offer = v.autopay && v.autopay.offer;
+    var facts = '<dl class="facts"><dt>Invoice</dt><dd>' + esc(v.invoiceNumber || '—') + '</dd>' +
+      (v.description ? '<dt>For</dt><dd>' + esc(v.description) + '</dd>' : '') +
+      (v.due ? '<dt>Due</dt><dd>' + fmtDate(v.due) + '</dd>' : '') +
+      (v.depositRequested != null
+        ? '<dt>Invoice balance</dt><dd>' + money(v.amountDue) + '</dd><dt class="total">Deposit requested</dt><dd class="total">' + money(v.depositRequested) + '</dd>'
+        : '<dt class="total">Amount due</dt><dd class="total">' + money(v.amountDue) + '</dd>') + '</dl>';
+    var consent = '';
+    if (offer) {
+      var parts = String(offer.consentText).split('\n\n');
+      consent = '<div class="consent"><div class="consent-row">' +
+        '<input type="checkbox" id="autopayOpt" aria-describedby="consentBody">' +
+        '<label for="autopayOpt"><span class="consent-title">' + esc(parts[0]) + '</span>' +
+        '<span class="consent-body" id="consentBody">' + esc(parts.slice(1).join('\n\n')) + '</span></label></div></div>';
+    }
+    show('<section class="panel"><h2>' + (v.depositRequested != null ? 'Deposit requested: ' + money(v.depositRequested) : 'Amount due: ' + money(v.amountDue)) + '</h2>' +
+      '<p class="lead">' + esc(business || 'Your contractor') + ' uses Stripe to take card payments securely.</p>' + facts +
+      (active ? '<p class="note note-ok">Automatic payments are on for this plan with ' + esc(active.card) + '.</p>' : '') +
+      consent +
+      '<div class="actions"><button class="button" id="payBtn" type="button"></button></div>' +
+      '<p class="status" id="payStatus" role="status" aria-live="polite"></p>' +
+      '<p class="fine">You’ll enter your card on Stripe’s secure checkout page.</p></section>');
+    var btn = document.getElementById('payBtn');
+    var opt = document.getElementById('autopayOpt');
+    function label() {
+      btn.textContent = 'Pay ' + money(pay) + (opt && opt.checked ? (offer.isUpdate ? ' and update automatic payments' : ' and turn on automatic payments') : '');
+    }
+    label();
+    if (opt) opt.addEventListener('change', label);
+    btn.addEventListener('click', function () {
+      var body = { t: token };
+      if (opt && opt.checked) body.autopay = { consentVersion: offer.consentVersion, amount: offer.amount };
+      startCheckout(btn, body);
+    });
+  }
+
+  // Only ever navigate to Stripe-hosted Checkout.
+  function isStripeUrl(url) {
+    try {
+      var u = new URL(String(url));
+      return u.protocol === 'https:' && (u.hostname === 'checkout.stripe.com' || /\.stripe\.com$/.test(u.hostname));
+    } catch (e) { return false; }
+  }
+
+  async function startCheckout(btn, body) {
+    var statusEl = document.getElementById('payStatus');
+    var original = btn.textContent;
+    btn.disabled = true;
+    btn.setAttribute('aria-busy', 'true');
+    btn.textContent = 'Opening secure checkout…';
+    statusEl.className = 'status';
+    statusEl.textContent = '';
+    try {
+      var r = await api('/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      if (r.ok && isStripeUrl(r.body.url)) {
+        location.assign(r.body.url);
+        return;
+      }
+      if (r.body && r.body.businessName) setBusiness(r.body.businessName);
+      var c = errorCopy(r.body && r.body.code, r.status);
+      if (['changed', 'maybe_paid', 'paid', 'in_flight', 'tips_off', 'invalid', 'gone', 'unavailable', 'expired', 'not_ready'].indexOf(r.body && r.body.code) !== -1) {
+        errorPanel(r.body.code, r.status);
+        return;
+      }
+      statusEl.className = 'status bad';
+      statusEl.textContent = c[0] + '. ' + c[1];
+    } catch (e) {
+      statusEl.className = 'status bad';
+      statusEl.textContent = 'We couldn’t reach the payment service. Check your connection, then try again.';
+    }
+    btn.disabled = false;
+    btn.removeAttribute('aria-busy');
+    btn.textContent = original;
+  }
+
+  // ── Mode s: set up automatic payments (portal) ───────────────────────────
+  function renderSetup(v) {
+    eyebrow.textContent = 'Automatic payments';
+    var parts = String(v.consentText).split('\n\n');
+    show('<section class="panel"><h2>Set up automatic payments</h2>' +
+      '<p class="lead">Save a card for your ' + (v.planDescription ? '“' + esc(v.planDescription) + '” ' : '') + 'plan. Nothing is charged today.</p>' +
+      '<dl class="facts"><dt>Plan</dt><dd>' + esc(v.planDescription || '—') + '</dd>' +
+      '<dt class="total">Amount</dt><dd class="total">' + money(v.amount) + (v.cadence ? ' ' + esc(v.cadence) : '') + '</dd></dl>' +
+      '<div class="consent"><div class="consent-row">' +
+      '<input type="checkbox" id="autopayOpt" required aria-required="true" aria-describedby="consentBody">' +
+      '<label for="autopayOpt"><span class="consent-title">' + esc(parts[0]) + '</span>' +
+      '<span class="consent-body" id="consentBody">' + esc(parts.slice(1).join('\n\n')) + '</span></label></div></div>' +
+      '<div class="actions"><button class="button" id="payBtn" type="button" disabled>Continue to secure card entry</button></div>' +
+      '<p class="status" id="payStatus" role="status" aria-live="polite">Tick the box above to continue.</p>' +
+      '<p class="fine">You’ll enter your card on Stripe’s secure page.</p></section>');
+    var btn = document.getElementById('payBtn');
+    var opt = document.getElementById('autopayOpt');
+    var statusEl = document.getElementById('payStatus');
+    opt.addEventListener('change', function () {
+      btn.disabled = !opt.checked;
+      statusEl.className = 'status';
+      statusEl.textContent = opt.checked ? '' : 'Tick the box above to continue.';
+    });
+    btn.addEventListener('click', function () {
+      if (!opt.checked) return;
+      startCheckout(btn, { s: token, consentVersion: v.consentVersion, amount: v.amount });
+    });
+  }
+
+  // ── Mode m: manage automatic payments ────────────────────────────────────
+  function renderManage(v) {
+    eyebrow.textContent = 'Automatic payments';
+    var plan = v.planDescription ? 'your “' + esc(v.planDescription) + '”' : 'your';
+    if (v.status === 'pending') {
+      var waiting = pendingPolls < 6;
+      show('<section class="panel"><h2>' + (setupDone ? 'Thanks! We’re confirming your card' : 'Your card is being confirmed') + '</h2>' +
+        '<p class="lead">' + (waiting ? 'This page updates in a moment.' : 'This can take a minute. Refresh this page, or watch for a confirmation email.') + '</p>' +
+        (waiting ? '' : '<div class="actions"><button class="button button-secondary" id="retry" type="button">Refresh</button></div>') + '</section>');
+      if (waiting) { pendingPolls++; setTimeout(load, 3000); }
+      else document.getElementById('retry').addEventListener('click', function () { pendingPolls = 0; load(); });
+      return;
+    }
+    if (v.status === 'on') {
+      show('<section class="panel"><h2>Automatic payments are on</h2>' +
+        '<p class="lead">Automatic payments are on for ' + plan + ' plan' + (v.card ? ' with ' + esc(v.card) : '') + '. Each invoice is charged on its due date, and you get a receipt every time.</p>' +
+        (setupDone ? '<p class="note note-ok">Your card is saved. You’ll get a confirmation email.</p>' : '') +
+        '<div class="actions" id="manageActions">' +
+        (v.canTurnOff ? '<button class="button button-secondary" id="offBtn" type="button">Turn off automatic payments</button>' : '') +
+        (v.setupUrl ? '<a class="button button-secondary" href="' + esc(v.setupUrl) + '">Use a different card</a>' : '') +
+        '</div><p class="status" id="manageStatus" role="status" aria-live="polite"></p></section>');
+      var off = document.getElementById('offBtn');
+      if (off) off.addEventListener('click', confirmOff);
+      return;
+    }
+    show('<section class="panel"><h2>Automatic payments are off</h2>' +
+      '<p class="lead">Invoices for ' + plan + ' plan are not charged automatically. Each one is emailed to you with a link to pay.</p>' +
+      (v.setupUrl ? '<div class="actions"><a class="button" href="' + esc(v.setupUrl) + '">Turn automatic payments back on</a></div>' : '') + '</section>');
+  }
+
+  function confirmOff() {
+    var actions = document.getElementById('manageActions');
+    actions.innerHTML = '<p class="note note-warn" style="margin:0">Turn off automatic payments? Future invoices won’t be charged automatically, and your saved card will be removed.</p>' +
+      '<button class="button button-danger" id="offYes" type="button">Yes, turn off</button>' +
+      '<button class="button button-secondary" id="offNo" type="button">Keep automatic payments</button>';
+    document.getElementById('offNo').addEventListener('click', load);
+    var yes = document.getElementById('offYes');
+    yes.focus();
+    yes.addEventListener('click', async function () {
+      var statusEl = document.getElementById('manageStatus');
+      yes.disabled = true;
+      yes.setAttribute('aria-busy', 'true');
+      yes.textContent = 'Turning off…';
+      try {
+        var r = await api('/autopay-off', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ m: token }) });
+        if (r.ok) {
+          show('<section class="panel"><h2>Automatic payments are off</h2><p class="lead">Your saved card was removed and future invoices won’t be charged automatically. We’ve emailed you a confirmation.</p></section>');
+          return;
+        }
+        var c = errorCopy(r.body && r.body.code, r.status);
+        statusEl.className = 'status bad';
+        statusEl.textContent = c[0] + '. ' + c[1];
+      } catch (e) {
+        statusEl.className = 'status bad';
+        statusEl.textContent = 'We couldn’t reach the payment service. Check your connection, then try again.';
+      }
+      yes.disabled = false;
+      yes.removeAttribute('aria-busy');
+      yes.textContent = 'Yes, turn off';
+    });
+  }
+
+  if (!mode) {
+    errorPanel('bad_request', 400);
+  } else {
+    load();
+  }
+</script>
+</body>
+</html>
