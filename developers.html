@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TradeReady API for Developers</title>
+  <meta name="description" content="Read-only API for TradeReady: connect your own tools to your customers, jobs, estimates, invoices, payments, expenses and mileage with a key you create in the app.">
+  <meta name="apple-itunes-app" content="app-id=6790681059">
+  <link rel="canonical" href="https://gettradereadyapp.com/developers">
+  <style>
+    @font-face { font-family: 'Chakra Petch'; src: url('/fonts/ChakraPetch-Bold.ttf') format('truetype'); font-weight: 700; font-display: swap; }
+    @font-face { font-family: 'Public Sans'; src: url('/fonts/PublicSans-Regular.ttf') format('truetype'); font-weight: 400; font-display: swap; }
+    @font-face { font-family: 'Public Sans'; src: url('/fonts/PublicSans-Medium.ttf') format('truetype'); font-weight: 500; font-display: swap; }
+    @font-face { font-family: 'Public Sans'; src: url('/fonts/PublicSans-SemiBold.ttf') format('truetype'); font-weight: 600; font-display: swap; }
+    @font-face { font-family: 'Public Sans'; src: url('/fonts/PublicSans-Bold.ttf') format('truetype'); font-weight: 700; font-display: swap; }
+    @font-face { font-family: 'IBM Plex Mono'; src: url('/fonts/IBMPlexMono-Medium.ttf') format('truetype'); font-weight: 500; font-display: swap; }
+
+    :root {
+      --bg: #f5f5f1;
+      --surface: #ffffff;
+      --ink: #14213d;
+      --muted: #666e7e; /* ≥4.5:1 on --bg and --surface (WCAG AA) */
+      --accent: #1d5c9e;
+      --accent-bg: #e4eef7;
+      --hero-navy: #0c335e;
+      --hero-ink: #f2f4f8;
+      --hero-line: rgba(242, 244, 248, .14);
+      --hero-muted: #9fb4cd;
+      --line: #d8dbe2;
+      --code-bg: #eef0f4;
+      --display: 'Chakra Petch', 'Segoe UI', sans-serif;
+      --body: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', monospace;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #101826;
+        --surface: #182238;
+        --ink: #f2f4f8;
+        --muted: #8b96a9; /* ≥4.5:1 on --bg and --surface (WCAG AA) */
+        --accent: #5b9bdb;
+        --accent-bg: #1b2c40;
+        --line: #2a3650;
+        --code-bg: #0b1220;
+      }
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--body); font-size: 17px; line-height: 1.65; color: var(--ink); background: var(--bg); }
+    a { color: var(--accent); }
+    :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+    .skip-link { position: absolute; left: -9999px; top: 0; background: var(--surface); color: var(--accent); padding: .6rem 1rem; z-index: 200; }
+    .skip-link:focus { left: 1rem; top: 1rem; }
+
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 1.25rem; }
+
+    /* ---------- header ---------- */
+    .topbar { position: sticky; top: 0; z-index: 100; background: var(--hero-navy); border-bottom: 1px solid var(--hero-line); }
+    .nav { display: flex; align-items: center; gap: 1.5rem; padding: 1.1rem 0; }
+    .wordmark { font-family: var(--display); font-weight: 700; font-size: 1.35rem; letter-spacing: .02em; color: var(--hero-ink); text-decoration: none; }
+    .wordmark span { color: #f0a04b; }
+    .nav nav { display: flex; gap: 1.4rem; margin-left: auto; }
+    .nav nav a { color: var(--hero-muted); text-decoration: none; font-weight: 600; font-size: .95rem; }
+    .nav nav a:hover, .nav nav a[aria-current="page"] { color: var(--hero-ink); }
+    .nav .mini-cta { display: inline-block; padding: .45rem .95rem; border: 1px solid rgba(242,244,248,.35); border-radius: 8px; color: var(--hero-ink); text-decoration: none; font-weight: 600; font-size: .9rem; white-space: nowrap; }
+    .nav .mini-cta:hover { background: rgba(242,244,248,.1); }
+
+    /* ---------- page head: drafted sheet band ---------- */
+    .page-hero {
+      background-color: var(--hero-navy);
+      background-image:
+        linear-gradient(var(--hero-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--hero-line) 1px, transparent 1px),
+        linear-gradient(rgba(242,244,248,.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(242,244,248,.05) 1px, transparent 1px);
+      background-size: 96px 96px, 96px 96px, 24px 24px, 24px 24px;
+      color: var(--hero-ink);
+      padding: 2.2rem 0 2.7rem;
+    }
+    .crumb { font-family: var(--mono); font-weight: 500; font-size: .78rem; letter-spacing: .04em; }
+    .crumb a { color: var(--hero-muted); text-decoration: none; display: inline-block; padding: .78rem 0; }
+    .crumb a:hover { color: var(--hero-ink); text-decoration: underline; }
+    .page-hero h1 { font-family: var(--display); font-weight: 700; font-size: clamp(2rem, 5vw, 2.7rem); line-height: 1.12; letter-spacing: .005em; margin: .2rem 0 .55rem; }
+    .tagline { color: #c9d6e6; font-size: 1.06rem; }
+
+    /* ---------- content ---------- */
+    .content { max-width: 50rem; padding: 2.4rem 0 .5rem; }
+    .content p { margin-bottom: .85rem; }
+    .content a { overflow-wrap: break-word; }
+    .content ul, .content ol { margin: 0 0 .85rem; }
+    .content ul { list-style: none; }
+    .content ul > li { position: relative; padding-left: 1.6rem; margin-bottom: .55rem; }
+    .content ul > li::before { content: ''; position: absolute; left: 0; top: .58em; width: .85rem; height: 2px; background: var(--accent); }
+    .content ol { padding-left: 1.4rem; }
+    .content ol > li { margin-bottom: .55rem; padding-left: .2rem; }
+    .content h2 { font-family: var(--display); font-weight: 700; font-size: 1.45rem; line-height: 1.2; margin: 2.6rem 0 .9rem; padding-top: 2.1rem; border-top: 1px solid var(--line); scroll-margin-top: 5rem; }
+    .content h3 { font-family: var(--display); font-weight: 700; font-size: 1.08rem; line-height: 1.3; margin: 1.7rem 0 .35rem; padding-left: 1.15rem; position: relative; scroll-margin-top: 5rem; }
+    .content h3::before { content: ''; position: absolute; left: 0; top: .55em; width: .7rem; height: 2px; background: var(--accent); }
+
+    code { font-family: var(--mono); font-size: .86em; background: var(--code-bg); border-radius: 4px; padding: .08em .3em; overflow-wrap: anywhere; }
+    pre { font-family: var(--mono); font-size: .84rem; line-height: 1.55; background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px; padding: .9rem 1rem; margin: 0 0 1rem; overflow-x: auto; }
+    pre code { background: none; padding: 0; font-size: inherit; overflow-wrap: normal; }
+
+    .callout {
+      background-color: var(--accent-bg);
+      border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 8px;
+      padding: 1rem 1.2rem; margin: 1.2rem 0;
+    }
+    .callout p:last-child { margin-bottom: 0; }
+
+    .toc { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.25rem; margin: 0 0 1.5rem; }
+    .toc p { font-family: var(--mono); font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-bottom: .4rem; }
+    .toc ol { columns: 2; column-gap: 2rem; padding-left: 1.2rem; margin: 0; }
+    .toc li { margin-bottom: .25rem; break-inside: avoid; }
+
+    .table-wrap { overflow-x: auto; margin: 0 0 1.2rem; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+    table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+    th, td { text-align: left; vertical-align: top; padding: .5rem .75rem; border-bottom: 1px solid var(--line); }
+    th { font-family: var(--mono); font-weight: 500; font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+    tr:last-child td { border-bottom: none; }
+    td:first-child { white-space: nowrap; }
+    .endpoint { font-size: .9rem; color: var(--muted); }
+
+    /* ---------- footer: title block ---------- */
+    footer { border-top: 2px solid var(--ink); margin-top: 3.5rem; }
+    .tblock { display: grid; grid-template-columns: repeat(4, 1fr); border-left: 1px solid var(--line); border-right: 1px solid var(--line); }
+    .tcell { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: .9rem 1.1rem; min-height: 5.2rem; min-width: 0; }
+    .tcell .v, .tcell a { overflow-wrap: anywhere; }
+    .tcell:nth-child(4n) { border-right: none; }
+    .tcell .k { font-family: var(--mono); font-weight: 500; font-size: .66rem; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: .3rem; }
+    .tcell .v { font-size: .92rem; font-weight: 600; }
+    .tcell a { text-decoration: none; display: inline-block; padding: .65rem 0; margin: -.4rem 0; }
+    .tcell a:hover { text-decoration: underline; }
+    .colophon { font-size: .82rem; color: var(--muted); padding: 1rem 0 2.2rem; text-align: center; }
+
+    /* ---------- responsive ---------- */
+    @media (max-width: 900px) {
+      .tblock { grid-template-columns: repeat(2, 1fr); }
+      .tcell:nth-child(2n) { border-right: none; }
+    }
+    @media (max-width: 720px) {
+      .topbar { position: static; }
+      .nav { flex-wrap: wrap; gap: .3rem 1.5rem; padding: .85rem 0; }
+      .nav nav { order: 3; flex-basis: 100%; margin-left: 0; }
+      .nav nav a { padding: .6rem 0; }
+      .nav .mini-cta { margin-left: auto; }
+      .page-hero { padding: 1.9rem 0 2.3rem; }
+      .content { padding-top: 2rem; }
+      .toc ol { columns: 1; }
+      td:first-child { white-space: normal; }
+    }
+    @media (max-width: 480px) {
+      .tblock { grid-template-columns: 1fr; }
+      .tcell { border-right: none; min-height: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="nav">
+      <a class="wordmark" href="/">TradeReady<span>.</span></a>
+      <nav aria-label="Site">
+        <a href="/#features">Features</a>
+        <a href="/#pricing">Pricing</a>
+        <a href="/guides/">Guides</a>
+        <a href="/support.html">Support</a>
+      </nav>
+      <a class="mini-cta" href="https://apps.apple.com/app/id6790681059">Get the app</a>
+    </div>
+  </div>
+</header>
+
+<div class="page-hero">
+  <div class="wrap">
+    <p class="crumb"><a href="/support.html">← Support</a></p>
+    <h1>TradeReady API</h1>
+    <p class="tagline">Read-only access to your own data, for the tools you already use</p>
+  </div>
+</div>
+
+<main id="main" class="wrap">
+<div class="content">
+
+  <p>The TradeReady API lets your bookkeeping software, a spreadsheet script or an automation tool read
+  your customers, jobs, estimates, invoices, payments, expenses and mileage. You create a key in the app,
+  choose what it can read, and give it to the tool. The API is <strong>read-only</strong>: nothing can
+  create, change or delete your data through it.</p>
+
+  <nav class="toc" aria-label="On this page">
+    <p>On this page</p>
+    <ol>
+      <li><a href="#keys">Get a key</a></li>
+      <li><a href="#auth">Authentication</a></li>
+      <li><a href="#scopes">Scopes</a></li>
+      <li><a href="#base-url">Base URL and first request</a></li>
+      <li><a href="#pagination">Pagination</a></li>
+      <li><a href="#sync">Incremental sync</a></li>
+      <li><a href="#freshness">How fresh the data is</a></li>
+      <li><a href="#limits">Rate limits</a></li>
+      <li><a href="#errors">Errors</a></li>
+      <li><a href="#versioning">Versioning</a></li>
+      <li><a href="#resources">Resources and fields</a></li>
+      <li><a href="#tools">Zapier and other tools</a></li>
+      <li><a href="#security">Security and privacy</a></li>
+      <li><a href="#changelog">Changelog</a></li>
+    </ol>
+  </nav>
+
+  <h2 id="keys">Get a key</h2>
+  <ol>
+    <li>In the TradeReady app, open <strong>Settings → API access</strong>. You need to be signed in and online.</li>
+    <li>Tap <strong>Create key</strong>, give it a name you'll recognize (for example “QuickBooks sync”), choose
+    what it can read, and pick when it expires: in 1 year (the default), in 90 days, or never.</li>
+    <li>Copy the key and paste it into your tool straight away. <strong>TradeReady shows a key once and can't
+    show it again</strong>, because we only keep a fingerprint of it, never the key itself.</li>
+  </ol>
+  <p>You can have up to 5 active keys. Each key's row in the app shows when it was last used, and
+  <strong>Recent activity</strong> lists its latest requests. Revoking a key stops it on the very next request.
+  Rotating a key gives you a new key with the same name and scopes; the old key keeps working for 24 hours
+  (or stops immediately, if you choose) so you have time to update your tool.</p>
+  <p>Keys look like <code>trk_</code> followed by 107 letters, digits, <code>-</code> and <code>_</code>. Every example on
+  this page uses a placeholder, never a real key.</p>
+
+  <h2 id="auth">Authentication</h2>
+  <p>Send the key in the <code>Authorization</code> header on every request:</p>
+  <pre><code>Authorization: Bearer trk_your_key_here</code></pre>
+  <ul>
+    <li><strong>Never put a key in a URL.</strong> A request with a key in its query string is refused with
+    <code>key_in_query</code>. URLs end up in logs and browser history, so treat a key that was ever sent in a URL
+    as exposed: revoke it and create a new one.</li>
+    <li><strong>Keys are for servers and scripts, not web pages.</strong> The API sends no CORS headers, so a
+    browser page can't read its responses. Keep keys in your tool's secret settings or an environment variable.</li>
+    <li>Only <code>GET</code> is accepted. Any other method gets <code>405 method_not_allowed</code>.</li>
+  </ul>
+
+  <h2 id="scopes">Scopes</h2>
+  <p>A key can only read what you allowed when you created it.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th scope="col">Scope</th><th scope="col">Lets the key read</th></tr></thead>
+    <tbody>
+      <tr><td><code>customers:read</code></td><td><code>/v1/customers</code></td></tr>
+      <tr><td><code>jobs:read</code></td><td><code>/v1/jobs</code> and <code>/v1/estimates</code></td></tr>
+      <tr><td><code>invoices:read</code></td><td><code>/v1/invoices</code> and <code>/v1/payments</code></td></tr>
+      <tr><td><code>expenses:read</code></td><td><code>/v1/expenses</code></td></tr>
+      <tr><td><code>mileage:read</code></td><td><code>/v1/mileage</code></td></tr>
+    </tbody>
+  </table></div>
+  <p>The app offers two presets: <strong>Everything</strong> (all five) and <strong>Bookkeeping</strong> (customers,
+  invoices, expenses and mileage). <code>/v1/account</code> works with any scope. Reading something outside the key's
+  scopes returns <code>403 insufficient_scope</code>.</p>
+
+  <h2 id="base-url">Base URL and first request</h2>
+  <p>Every endpoint lives under one base URL:</p>
+  <pre><code id="base-url-value">https://tradeready-backend.tradeready.workers.dev</code></pre>
+  <p>Check that your key works:</p>
+  <pre><code>export TRADEREADY_API_KEY="trk_your_key_here"
+
+curl https://tradeready-backend.tradeready.workers.dev/v1/account \
+  -H "Authorization: Bearer $TRADEREADY_API_KEY"</code></pre>
+  <pre><code>{
+  "data": {
+    "businessName": "Ruiz Electric",
+    "currency": "USD",
+    "dataAsOf": "2026-10-03T17:42:10.512Z",
+    "apiVersion": "2026-10-03",
+    "key": { "id": "6f1c…", "name": "QuickBooks sync", "prefix": "trk_Ab3dE9fQ", "scopes": ["invoices:read"], "expiresAt": "2027-10-03T17:00:00.000Z" }
+  }
+}</code></pre>
+  <p>A machine-readable description of every endpoint and field is at
+  <a href="https://tradeready-backend.tradeready.workers.dev/v1/openapi.json"><code>/v1/openapi.json</code></a>
+  (OpenAPI 3.1, no key needed).</p>
+
+  <h3>Conventions</h3>
+  <ul>
+    <li>Money is a JSON number in US dollars, rounded to cents.</li>
+    <li>Business dates (due dates, job dates, expense dates) are returned exactly as entered, usually
+    <code>YYYY-MM-DD</code>, and are never shifted between time zones.</li>
+    <li><code>updatedAt</code> and other server times are ISO-8601 in UTC.</li>
+    <li>Every object always has the same fields. A value that isn't set is <code>null</code>, never missing.</li>
+    <li>Archived records are included, with <code>archivedAt</code> set.</li>
+  </ul>
+
+  <h2 id="pagination">Pagination</h2>
+  <p>List endpoints return one page at a time, oldest change first:</p>
+  <pre><code>GET /v1/invoices?limit=100</code></pre>
+  <pre><code>{
+  "data": [ … up to 100 invoices … ],
+  "nextCursor": "eyJ1Ijoi…",
+  "dataAsOf": "2026-10-03T17:42:10.512Z",
+  "nextUpdatedSince": "2026-10-03T17:40:05.120Z"
+}</code></pre>
+  <ul>
+    <li><code>limit</code> is 1 to 100 (default 50).</li>
+    <li>Pass <code>nextCursor</code> back as <code>cursor</code> to get the next page. When <code>nextCursor</code> is
+    <code>null</code>, you have everything. Cursors are opaque; don't build or edit them.</li>
+    <li>Records are ordered by <code>updatedAt</code>, then <code>id</code>, so a page never shifts under you while you read.</li>
+    <li>A single record is <code>GET /v1/{resource}/{id}</code> and returns <code>{"data": {…}, "dataAsOf": …}</code>.
+    A record that doesn't exist, was deleted, or isn't yours is <code>404 not_found</code>.</li>
+    <li><strong>Payments</strong> are paged by invoice: one page holds the payments of up to <code>limit</code> invoices,
+    so a page can hold any number of payments, including none. Keep following <code>nextCursor</code>.</li>
+    <li>Unknown query parameters are refused with <code>400 invalid_parameter</code>, so a typo never silently returns everything.</li>
+  </ul>
+
+  <h2 id="sync">Incremental sync</h2>
+  <p>To keep another system up to date, read everything once, then ask only for what changed:</p>
+  <ol>
+    <li>First run: page through <code>/v1/invoices</code> with no <code>updated_since</code>. Save each record by its <code>id</code>.</li>
+    <li>When the last page arrives (<code>nextCursor</code> is <code>null</code>), store its <code>nextUpdatedSince</code>.</li>
+    <li>Next run: send <code>updated_since=&lt;the value you stored&gt;</code> and page through again. Store the new
+    <code>nextUpdatedSince</code> when you finish. If nothing changed it is <code>null</code>: keep your old value.</li>
+  </ol>
+  <p><code>nextUpdatedSince</code> deliberately overlaps the previous run by 5 seconds, so a change saved at the
+  same moment as your last request is never missed. You may see a record twice; save by <code>id</code> and the
+  duplicate is harmless.</p>
+  <h3 id="tombstones">Deleted records</h3>
+  <p>With <code>updated_since</code>, records deleted since then come back as tombstones, so you can remove them too:</p>
+  <pre><code>{ "id": "inv1727992000000", "deleted": true, "updatedAt": "2026-10-03T16:02:41.000Z" }</code></pre>
+  <p>Without <code>updated_since</code>, deleted records are left out.</p>
+  <h3>Worked example (Node.js 18 or later)</h3>
+  <pre><code>const BASE = "https://tradeready-backend.tradeready.workers.dev";
+const headers = { Authorization: `Bearer ${process.env.TRADEREADY_API_KEY}` };
+
+// store: your own storage, e.g. a database table keyed by id.
+async function syncInvoices(store) {
+  const since = await store.getWatermark("invoices"); // null on the first run
+  let cursor = null;
+  let watermark = null;
+  for (;;) {
+    const url = new URL("/v1/invoices", BASE);
+    url.searchParams.set("limit", "100");
+    if (since) url.searchParams.set("updated_since", since);
+    if (cursor) url.searchParams.set("cursor", cursor);
+
+    const res = await fetch(url, { headers });
+    if (res.status === 429) {
+      const wait = Number(res.headers.get("Retry-After") || 60);
+      await new Promise((r) =&gt; setTimeout(r, wait * 1000));
+      continue; // same page again
+    }
+    const body = await res.json();
+    if (!res.ok) throw new Error(`${res.status} ${body.error.code}: ${body.error.message}`);
+
+    for (const item of body.data) {
+      if (item.deleted) await store.remove(item.id);
+      else await store.upsert(item.id, item);
+    }
+    watermark = body.nextUpdatedSince ?? watermark;
+    if (!body.nextCursor) break;
+    cursor = body.nextCursor;
+  }
+  if (watermark) await store.setWatermark("invoices", watermark);
+}</code></pre>
+
+  <h2 id="freshness">How fresh the data is</h2>
+  <div class="callout">
+    <p><strong>The API shows the cloud copy of your data as of your phone's last sync.</strong> TradeReady works
+    offline; anything you change on a device reaches the API after that device syncs.</p>
+  </div>
+  <p>Every response includes <code>dataAsOf</code>: the newest change the cloud has for that kind of record (or, on
+  <code>/v1/account</code>, across everything the key can read). If it is older than you expect, open the app on
+  the phone you used and let it sync.</p>
+
+  <h2 id="limits">Rate limits</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th scope="col">Limit</th><th scope="col">Applies to</th></tr></thead>
+    <tbody>
+      <tr><td>60 requests per minute</td><td>each key</td></tr>
+      <tr><td>5,000 requests per day</td><td>each key (days are UTC)</td></tr>
+      <tr><td>10,000 requests per day</td><td>all of your keys together</td></tr>
+    </tbody>
+  </table></div>
+  <p>Responses carry <code>X-RateLimit-Limit</code>, <code>X-RateLimit-Remaining</code> and <code>X-RateLimit-Reset</code>
+  (Unix time, in seconds, when the current minute's allowance resets). Over a limit, you get <code>429 rate_limited</code>
+  with a <code>Retry-After</code> header in seconds; wait that long and try again. Requests that are refused don't use
+  up your allowance. Polling every 15 minutes across all seven lists uses fewer than 700 requests a day.</p>
+  <p>Repeated requests with bad keys from one address are slowed down too.</p>
+
+  <h2 id="errors">Errors</h2>
+  <p>Errors have one shape and a stable <code>code</code> you can program against:</p>
+  <pre><code>{ "error": { "code": "insufficient_scope", "message": "This API key does not have the scope this resource needs." } }</code></pre>
+  <div class="table-wrap"><table id="error-codes">
+    <thead><tr><th scope="col">Status</th><th scope="col">Code</th><th scope="col">Meaning</th></tr></thead>
+    <tbody>
+      <tr><td>400</td><td><code>invalid_parameter</code></td><td>An unknown, repeated or malformed query parameter. The message names it.</td></tr>
+      <tr><td>400</td><td><code>invalid_cursor</code></td><td>The cursor isn't valid for this list. Start again without one.</td></tr>
+      <tr><td>400</td><td><code>key_in_query</code></td><td>A key was sent in the URL. Revoke it and use the header.</td></tr>
+      <tr><td>401</td><td><code>invalid_key</code></td><td>No key, a malformed key, or a key TradeReady doesn't recognize.</td></tr>
+      <tr><td>401</td><td><code>key_revoked</code></td><td>The key was revoked in the app.</td></tr>
+      <tr><td>401</td><td><code>key_expired</code></td><td>The key reached its expiry date, or its rotation grace period ended.</td></tr>
+      <tr><td>403</td><td><code>insufficient_scope</code></td><td>The key can't read this kind of record.</td></tr>
+      <tr><td>404</td><td><code>not_found</code></td><td>No such endpoint, or no such record for this account.</td></tr>
+      <tr><td>405</td><td><code>method_not_allowed</code></td><td>The API is read-only. Use <code>GET</code>.</td></tr>
+      <tr><td>429</td><td><code>rate_limited</code></td><td>Too many requests. Wait for <code>Retry-After</code> seconds.</td></tr>
+      <tr><td>500</td><td><code>server_error</code></td><td>Something went wrong on our side. Try again later.</td></tr>
+      <tr><td>503</td><td><code>unavailable</code></td><td>The API is temporarily unavailable. Try again later.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="versioning">Versioning</h2>
+  <ul>
+    <li>The version is in the path: <code>/v1</code>. Within <code>/v1</code> we only <strong>add</strong> things: new
+    endpoints, new fields and new values for fields like <code>status</code>. Write your code so an unfamiliar field or
+    value doesn't break it.</li>
+    <li>A change that could break existing code ships as <code>/v2</code>, and <code>/v1</code> keeps working for at
+    least 6 months after that. During that time <code>/v1</code> responses carry <code>Deprecation</code> and
+    <code>Sunset</code> headers.</li>
+    <li>Every response has a <code>TradeReady-Api-Version</code> header with the date of the last addition, for your logs.</li>
+  </ul>
+
+  <h2 id="resources">Resources and fields</h2>
+  <p>These are all the fields the API returns. Anything else you keep in TradeReady, such as private notes,
+  labour rates and costs, markup and margins, photos and receipt images, or your settings, is never available
+  through the API.</p>
+
+  <h3 id="res-account">Account</h3>
+  <p class="endpoint"><code>GET /v1/account</code> · any scope</p>
+  <div class="table-wrap"><table class="fields" data-resource="account">
+    <thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Notes</th></tr></thead>
+    <tbody>
+      <tr><td><code>businessName</code></td><td>string | null</td><td>Your business name from Settings.</td></tr>
+      <tr><td><code>currency</code></td><td>string</td><td>Always <code>USD</code>.</td></tr>
+      <tr><td><code>dataAsOf</code></td><td>string | null</td><td>Newest change across the data this key can read.</td></tr>
+      <tr><td><code>apiVersion</code></td><td>string</td><td>Date of the last additive change to <code>/v1</code>.</td></tr>
+      <tr><td><code>key</code></td><td>object</td><td>The calling key: <code>{id, name, prefix, scopes, expiresAt}</code>.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 id="res-customers">Customers</h3>
+  <p class="endpoint"><code>GET /v1/customers</code> · <code>GET /v1/customers/{id}</code> · scope <code>customers:read</code></p>
+  <div class="table-wrap"><table class="fields" data-resource="customers">
+    <thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Notes</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>string</td><td>Stable id.</td></tr>
+      <tr><td><code>name</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>email</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>phone</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>address</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>leadSource</code></td><td>string | null</td><td>How the customer found you: a preset such as <code>google</code>, or your own label.</td></tr>
+      <tr><td><code>createdAt</code></td><td>string | null</td><td>As stored.</td></tr>
+      <tr><td><code>archivedAt</code></td><td>string | null</td><td>Set when archived. Archived records are still listed.</td></tr>
+      <tr><td><code>updatedAt</code></td><td>string</td><td>Server time of the last change, UTC.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 id="res-jobs">Jobs</h3>
+  <p class="endpoint"><code>GET /v1/jobs</code> · <code>GET /v1/jobs/{id}</code> · scope <code>jobs:read</code></p>
+  <div class="table-wrap"><table class="fields" data-resource="jobs">
+    <thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Notes</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>string</td><td>Stable id.</td></tr>
+      <tr><td><code>customerId</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>customerName</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>title</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>description</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>status</code></td><td>string | null</td><td><code>lead</code>, <code>estimate_sent</code>, <code>approved</code>, <code>scheduled</code>, <code>in_progress</code>, <code>complete</code>, <code>invoiced</code>, <code>paid</code> or <code>declined</code>.</td></tr>
+      <tr><td><code>scheduledDate</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>scheduledStartTime</code></td><td>string | null</td><td>Local time, <code>HH:mm</code>.</td></tr>
+      <tr><td><code>scheduledEndTime</code></td><td>string | null</td><td>Local time, <code>HH:mm</code>.</td></tr>
+      <tr><td><code>address</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>price</code></td><td>number</td><td>The customer-facing estimate total. Rates, costs, markup and margin are never included.</td></tr>
+      <tr><td><code>invoiceId</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>recurringJobId</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>estimateSentAt</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>createdAt</code></td><td>string | null</td><td>As stored.</td></tr>
+      <tr><td><code>archivedAt</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>updatedAt</code></td><td>string</td><td>Server time of the last change, UTC.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 id="res-estimates">Estimates</h3>
+  <p class="endpoint"><code>GET /v1/estimates</code> · <code>GET /v1/estimates/{id}</code> · scope <code>jobs:read</code></p>
+  <div class="table-wrap"><table class="fields" data-resource="estimates">
+    <thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Notes</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>string</td><td>The job id. Estimates are jobs with an approval link or a sent date.</td></tr>
+      <tr><td><code>jobId</code></td><td>string</td><td></td></tr>
+      <tr><td><code>customerId</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>customerName</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>title</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>status</code></td><td>string</td><td><code>draft</code>, <code>sent</code>, <code>approved</code>, <code>declined</code> or <code>expired</code>.</td></tr>
+      <tr><td><code>sentAt</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>validUntil</code></td><td>string | null</td><td>Last day the estimate can be accepted, in your time zone.</td></tr>
+      <tr><td><code>total</code></td><td>number</td><td>The accepted total once approved; the lowest option for an undecided good/better/best estimate; otherwise the quoted total.</td></tr>
+      <tr><td><code>lineItems</code></td><td>array of objects</td><td>Array of <code>{label, amount}</code>, as the customer saw them.</td></tr>
+      <tr><td><code>options</code></td><td>object | null</td><td>Good/better/best choices: <code>{tiers[{id, name, total}], addOns[{id, label, amount}], recommendedTierId}</code>, or null.</td></tr>
+      <tr><td><code>decision</code></td><td>string | null</td><td><code>approved</code>, <code>declined</code> or null.</td></tr>
+      <tr><td><code>decidedAt</code></td><td>string | null</td><td>When the customer decided on the approval page. Null for a decision you recorded yourself.</td></tr>
+      <tr><td><code>signerName</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>selection</code></td><td>object | null</td><td>The accepted option: <code>{tierId, tierName, addOnIds, total}</code>, or null.</td></tr>
+      <tr><td><code>updatedAt</code></td><td>string</td><td>Server time of the last change, UTC.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 id="res-invoices">Invoices</h3>
+  <p class="endpoint"><code>GET /v1/invoices</code> · <code>GET /v1/invoices/{id}</code> · scope <code>invoices:read</code></p>
+  <div class="table-wrap"><table class="fields" data-resource="invoices">
+    <thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Notes</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>string</td><td>Stable id.</td></tr>
+      <tr><td><code>number</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>customerId</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>customerName</code></td><td>string | null</td><td>The name on the invoice. Email and phone live on <code>/v1/customers</code>.</td></tr>
+      <tr><td><code>jobId</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>recurringInvoiceId</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>description</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>amount</code></td><td>number</td><td></td></tr>
+      <tr><td><code>amountPaid</code></td><td>number</td><td>Sum of payments that are not voided.</td></tr>
+      <tr><td><code>balanceDue</code></td><td>number</td><td></td></tr>
+      <tr><td><code>status</code></td><td>string</td><td><code>paid</code>, <code>partly_paid</code> or <code>unpaid</code>.</td></tr>
+      <tr><td><code>issueDate</code></td><td>string | null</td><td>Recovered from the invoice id when possible, otherwise null.</td></tr>
+      <tr><td><code>due</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>paid</code></td><td>boolean</td><td>The invoice’s paid flag as stored.</td></tr>
+      <tr><td><code>paidAt</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>depositRequest</code></td><td>object | null</td><td><code>{amount, percent, requestedAt}</code>, or null.</td></tr>
+      <tr><td><code>lineItems</code></td><td>array of objects</td><td>Array of <code>{description, category, amount}</code>.</td></tr>
+      <tr><td><code>payments</code></td><td>array of objects</td><td>The same objects as <code>/v1/payments</code>.</td></tr>
+      <tr><td><code>paymentLinkUrl</code></td><td>string | null</td><td>Only while the invoice is unpaid and the link was made for the current balance.</td></tr>
+      <tr><td><code>updatedAt</code></td><td>string</td><td>Server time of the last change, UTC.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 id="res-payments">Payments</h3>
+  <p class="endpoint"><code>GET /v1/payments</code> · <code>GET /v1/payments/{id}</code> · scope <code>invoices:read</code></p>
+  <div class="table-wrap"><table class="fields" data-resource="payments">
+    <thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Notes</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>string</td><td>A payment recorded before payment history existed has the id <code>legacy_&lt;invoiceId&gt;</code>.</td></tr>
+      <tr><td><code>invoiceId</code></td><td>string</td><td></td></tr>
+      <tr><td><code>invoiceNumber</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>customerId</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>amount</code></td><td>number</td><td></td></tr>
+      <tr><td><code>date</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>method</code></td><td>string</td><td><code>stripe</code>, <code>cash</code>, <code>check</code>, <code>card</code>, <code>bank_transfer</code> or <code>other</code>.</td></tr>
+      <tr><td><code>source</code></td><td>string</td><td><code>device</code>, <code>stripe</code> or <code>legacy</code>.</td></tr>
+      <tr><td><code>voided</code></td><td>boolean</td><td>Voided payments stay listed and count for nothing.</td></tr>
+      <tr><td><code>voidedAt</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>processorReference</code></td><td>string | null</td><td>The Stripe reference for card payments taken through Stripe, else null.</td></tr>
+      <tr><td><code>updatedAt</code></td><td>string</td><td>The invoice’s <code>updatedAt</code>.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 id="res-expenses">Expenses</h3>
+  <p class="endpoint"><code>GET /v1/expenses</code> · <code>GET /v1/expenses/{id}</code> · scope <code>expenses:read</code></p>
+  <div class="table-wrap"><table class="fields" data-resource="expenses">
+    <thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Notes</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>string</td><td>Stable id.</td></tr>
+      <tr><td><code>date</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>description</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>amount</code></td><td>number</td><td></td></tr>
+      <tr><td><code>category</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>categoryLabel</code></td><td>string</td><td>Display name for <code>category</code>. Unknown categories show as “Other”.</td></tr>
+      <tr><td><code>jobId</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>hasReceipt</code></td><td>boolean</td><td>Whether a receipt photo is attached. The photo itself is not available.</td></tr>
+      <tr><td><code>createdAt</code></td><td>string | null</td><td>As stored.</td></tr>
+      <tr><td><code>updatedAt</code></td><td>string</td><td>Server time of the last change, UTC.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 id="res-mileage">Mileage</h3>
+  <p class="endpoint"><code>GET /v1/mileage</code> · <code>GET /v1/mileage/{id}</code> · scope <code>mileage:read</code></p>
+  <div class="table-wrap"><table class="fields" data-resource="mileage">
+    <thead><tr><th scope="col">Field</th><th scope="col">Type</th><th scope="col">Notes</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>string</td><td>Stable id.</td></tr>
+      <tr><td><code>date</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>miles</code></td><td>number | null</td><td>Distance for the trip.</td></tr>
+      <tr><td><code>odometerStart</code></td><td>number | null</td><td></td></tr>
+      <tr><td><code>odometerEnd</code></td><td>number | null</td><td></td></tr>
+      <tr><td><code>fromLabel</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>toLabel</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>fromJobId</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>toJobId</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>purpose</code></td><td>string | null</td><td></td></tr>
+      <tr><td><code>createdAt</code></td><td>string | null</td><td>As stored.</td></tr>
+      <tr><td><code>updatedAt</code></td><td>string</td><td>Server time of the last change, UTC.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="tools">Zapier and other tools</h2>
+  <p>Any tool that can send a <code>GET</code> request with a custom header can use the API. In Zapier, use
+  <strong>Webhooks by Zapier</strong> to poll a list endpoint, such as
+  <code>https://tradeready-backend.tradeready.workers.dev/v1/invoices?limit=100</code>, with the header
+  <code>Authorization: Bearer &lt;your key&gt;</code>, and use <code>id</code> to tell records apart. There is no listed
+  TradeReady app in Zapier yet, and the API does not send webhooks; poll instead, no more often than you need.</p>
+
+  <h2 id="security">Security and privacy</h2>
+  <ul>
+    <li>Anyone who has a key can read the kinds of data you chose for it, until it expires or you revoke it.
+    Only give keys to services you trust, and give each service its own key so you can revoke one without the others.</li>
+    <li>TradeReady stores only a one-way fingerprint of each key, so a key can't be recovered from our systems.</li>
+    <li>We log each API request (time, key, endpoint and IP address) for 90 days for security, and show recent
+    activity to you in the app. We never log the key itself or the details of your query.</li>
+    <li>Deleting your TradeReady account deletes every key and its activity log with it.</li>
+    <li>See our <a href="/privacy.html">Privacy Policy</a> and <a href="/terms.html">Terms of Service</a>. Questions or a
+    security concern: <a href="mailto:support@gettradereadyapp.com">support@gettradereadyapp.com</a>.
+    Please never email us a key.</li>
+  </ul>
+
+  <h2 id="changelog">Changelog</h2>
+  <ul>
+    <li><strong>2026-10-03</strong> — <code>/v1</code> released: account, customers, jobs, estimates, invoices, payments,
+    expenses and mileage, with incremental sync and tombstones.</li>
+  </ul>
+
+</div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="tblock">
+      <div class="tcell"><span class="k">Project</span><span class="v">TradeReady</span></div>
+      <div class="tcell"><span class="k">Contact</span><span class="v"><a href="mailto:support@gettradereadyapp.com">support@gettradereadyapp.com</a></span></div>
+      <div class="tcell"><span class="k">Privacy</span><span class="v"><a href="/privacy.html">Privacy Policy</a></span></div>
+      <div class="tcell"><span class="k">Terms</span><span class="v"><a href="/terms.html">Terms of Service</a></span></div>
+    </div>
+    <p class="colophon">© 2026 Chad Rector. TradeReady is not affiliated with Apple Inc.</p>
+  </div>
+</footer>
+
+</body>
+</html>

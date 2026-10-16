@@ -99,7 +99,7 @@
 <main class="wrap">
 <div class="page">
   <h1>Privacy Policy</h1>
-  <p class="meta">Effective date: July 30, 2026</p>
+  <p class="meta">Effective date: October 15, 2026</p>
 
   <p>TradeReady ("we," "our," or "the app") is a job management and invoicing tool for independent tradespeople. This policy explains what data we collect, how we use it, and your choices.</p>
 
@@ -108,10 +108,14 @@
     <li><strong>Account:</strong> your email address when you sign up.</li>
     <li><strong>Business profile:</strong> business name, contact name, phone, address, and trade type — entered by you in Settings.</li>
     <li><strong>App data:</strong> jobs, invoices, customers, expenses, and notes you create inside the app.</li>
+    <li><strong>Calendar busy times (optional):</strong> if you turn on calendar checks, the app reads the calendars you choose on your device and sends us only the start and end times of busy periods in your booking window (up to about two months ahead), together with a random identifier for that app installation, so your booking page doesn't offer those times. Event titles, locations, notes and attendees never leave your device. Each update replaces the last one, and turning calendar checks off deletes them from our servers. If you turn on "Add my jobs to a TradeReady calendar", the app writes your scheduled jobs into a calendar on your device (your calendar account, such as iCloud, may sync it); our servers aren't involved.</li>
     <li><strong>Notification preferences:</strong> your invoice reminder rules and, if you grant permission, a device push token used to deliver local notifications.</li>
     <li><strong>Subscription status:</strong> when you subscribe to TradeReady Pro, we receive your subscription state (active, trial, expired) and purchase receipts from Apple or Google via RevenueCat. We never see or store your card number — payment is handled entirely by the app stores.</li>
     <li><strong>Optional API keys (Groq, Anthropic):</strong> if you choose to use your own AI keys (Settings → AI Assistant → Advanced), they are stored exclusively in your device's iOS Keychain or Android Keystore and never leave your device to TradeReady servers.</li>
     <li><strong>Estimate approval records:</strong> if you send your customer a link to approve or decline an estimate, and they act on it, we store their typed name (on approval only), the decision, a server timestamp, their IP address, and their browser's user-agent string as an electronic-consent record tied to that estimate.</li>
+    <li><strong>Customer requests:</strong> when your customers send you a request through your booking link, your customer portal or an estimate page (for example a booking request, a change request, or a request for an updated estimate), we store what they enter, such as their name, contact details, job address, a description of the work, preferred timing or a short note, so you can see and respond to it in the app.</li>
+    <li><strong>Referral links:</strong> a business that uses TradeReady may give you a personal booking link to pass along. The link contains a random code with no personal information in it. When someone books through it, the code is saved with their request so the business can see who referred them. TradeReady's servers don't look the code up. The person booking is never shown who referred them, and TradeReady never contacts the person who shared the link. Any thank-you or credit is recorded by the business in its own records; TradeReady doesn't send gifts, credits or money.</li>
+    <li><strong>Automatic-payment records:</strong> if your customer turns on automatic payments, we store the card brand, last four digits and expiry date (never the full card number, which stays with Stripe), Stripe identifiers, the authorization text they accepted, and the time, IP address and browser user-agent of that authorization, plus a record of each automatic charge attempt.</li>
   </ul>
 
   <h2>2. How We Use Your Information</h2>
@@ -129,7 +133,9 @@
   <p>TradeReady integrates with the following services. Each processes data according to its own privacy policy.</p>
   <ul>
     <li><strong>Supabase</strong> — authentication and cloud data sync. <a href="https://supabase.com/privacy" target="_blank">supabase.com/privacy</a></li>
-    <li><strong>Stripe</strong> — payment collection from your customers through your own connected Stripe account (Stripe Connect), and payment-link generation. <a href="https://stripe.com/privacy" target="_blank">stripe.com/privacy</a></li>
+    <li><strong>Stripe</strong> — payment collection from your customers through your own connected Stripe account (Stripe Connect), and payment-link generation, including saving your customers' payment methods for automatic payments they authorize. <a href="https://stripe.com/privacy" target="_blank">stripe.com/privacy</a></li>
+    <li><strong>Resend</strong> — email delivery. Invoices, reminders, receipts and other emails TradeReady sends for you, and notifications sent to you (such as new booking requests), go through Resend, which receives the recipient's email address and the message, including any attached invoice PDF. <a href="https://resend.com/legal/privacy-policy" target="_blank">resend.com/legal/privacy-policy</a></li>
+    <li><strong>Cloudflare</strong> — hosting for TradeReady's backend and file storage. Requests from the app, and from your customers' estimate, booking, portal and payment pages, are handled on Cloudflare (which processes IP addresses to deliver them), and invoice PDFs and photos you share are stored there. <a href="https://www.cloudflare.com/privacypolicy/" target="_blank">cloudflare.com/privacypolicy</a></li>
     <li><strong>RevenueCat</strong> — subscription management for TradeReady Pro. RevenueCat receives purchase receipts from Apple/Google and an app user identifier so we can verify your subscription. <a href="https://www.revenuecat.com/privacy" target="_blank">revenuecat.com/privacy</a></li>
     <li><strong>Anthropic</strong> — AI-generated estimate messages, pricebook pricing suggestions, and receipt scanning. Relevant job, invoice, or service details are sent to Anthropic to generate the text — by default through TradeReady's backend, or directly if you supply your own API key. When you attach a receipt photo to an expense, that photo is sent to Anthropic to read the merchant, total, and date; receipt photos you attach without scanning, and all other photos, never leave your device. <a href="https://www.anthropic.com/legal/privacy" target="_blank">anthropic.com/legal/privacy</a></li>
     <li><strong>Groq</strong> — AI chat assistant. Your chat messages and a summary of your business data (revenue, overdue invoices, active jobs) are sent to Groq to generate responses — by default through TradeReady's backend, or directly if you supply your own API key. <a href="https://groq.com/privacy-policy/" target="_blank">groq.com/privacy-policy</a></li>
@@ -142,6 +148,7 @@
 
   <h2>5. Data Sharing</h2>
   <p>We do not sell, rent, or share your personal information with third parties for advertising or marketing purposes. Data is shared only with the service providers listed above as necessary to operate the app.</p>
+  <p>If you create an API key, services you give it to can read the data types you chose. We log each API request (time, key, endpoint, IP address) for 90 days for security.</p>
 
   <h2>6. Data Security</h2>
   <p>All data in transit is encrypted via HTTPS/TLS. Sensitive credentials (API keys, payment tokens) are stored in your device's platform keychain. Cloud data is protected by Supabase's row-level security policies, which restrict each user to their own records.</p>
